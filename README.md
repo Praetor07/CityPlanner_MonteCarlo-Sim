@@ -1,3 +1,6 @@
+**Emergency Response Monte-Carlo Simulation for City Planning**
+
+
 **Background:**
 This project is a Monte-Carlo simulation of a city with random emergency situations that need to be attended to. We have defined the cities to have three types of emergency response unit buildings: Large with 5 emergency response teams, Medium with 3 emergency response teams and Small with 1 emergency response team. Given a configuration with locations of the emergency response unit buildings, a simulation is run randomizing the time, location, and intensity of each emergency, along with possible traffic along the route. The solution finds the average emergency response time and success rate of resolving the emergencies for the given configuration, and can be run over multiple configurations to determine which one produces the minimum response time and maximum success rate for the emergencies. This type of simulation can be useful for city planning.
 
@@ -12,9 +15,9 @@ This project is a Monte-Carlo simulation of a city with random emergency situati
 
 
 **Randomized Variables:**
-1) Time of Emergency: Randomizing the occurrence of emergencies with respect to time
-2) Location of Emergency: Randomizing the location coordinates of the emergency as a probability distribution of the population density of the zones
-3) Intensity of Emergency: Each emergency can have an intensity which is measured on a scale of 1 to 5, with 1 being the lowest intensity and 5 being the highest intensity. The number of emergency teams and the total time taken to resolve the emergency will be a function of the intensity of the emergency. The intensity of the emergency will be randomized on the discrete scale mentioned above.
+1) Time of Emergency: Randomizing the occurrence of emergencies with respect to time - probability distribution of emergency occurring at current time, with higher probability of during specific times of day (distribution derived from data)
+2) Location of Emergency: Randomizing the location coordinates of the emergency as a probability distribution of the population density of the zones - distribution of 
+3) Intensity of Emergency: Each emergency can have an intensity which is measured on a scale of 1 to 5, with 1 being the lowest intensity and 5 being the highest intensity. The number of emergency teams and the total time taken to resolve the emergency will be a function of the intensity of the emergency. The intensity of the emergency will be randomized on the discrete scale mentioned above.- probability distribution of intensity of emergency
 4) Traffic: Randomizing the traffic present along the different paths in the city as a probability distribution of the time and population density of the zone.  
 
 
