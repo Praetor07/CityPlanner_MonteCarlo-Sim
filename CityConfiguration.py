@@ -16,7 +16,7 @@ class City:
         self.population_densities = population_densities
         self.coordinate_pop_densities = []
         for p in population_densities:
-            for _ in range(9):
+            for _ in range(9): # number of nodes per zone?
                 self.coordinate_pop_densities.append(p)
         self.cumulative_sum_densities = []
         for i in range(len(self.coordinate_pop_densities)):
