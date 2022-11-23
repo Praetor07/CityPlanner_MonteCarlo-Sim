@@ -1,7 +1,8 @@
 class EmergencyUnit:
     # Class variable - Mapping of emergency unit size to number of teams present
     # Class variable - List of all emergency units (all objects of class)
-    def __init__(self, size, location):
+
+    def __init__(self, size, location, population_densities: list):
         """
         Initialize size and location of the emergency unit, along with number of teams currently available
         :param size:

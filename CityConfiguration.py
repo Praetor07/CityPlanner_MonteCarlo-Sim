@@ -11,6 +11,20 @@ class City:
         (this will be used to randomize zone of an emergency as a distribution of the population
         density and then determine a random coordinate within the zone)
         """
+        self.width = width
+        self.height = height
+        self.population_densities = population_densities
+        self.coordinate_pop_densities = []
+        for p in population_densities:
+            for _ in range(9):
+                self.coordinate_pop_densities.append(p)
+        self.cumulative_sum_densities = []
+        for i in range(len(self.coordinate_pop_densities)):
+            if i == 0:
+                self.cumulative_sum_densities.append(self.coordinate_pop_densities[i])
+            else:
+                self.cumulative_sum_densities.append(self.coordinate_pop_densities[i] +
+                                                     self.cumulative_sum_densities[i - 1])
 
     def update_graph_edges(self, time_of_day: int):
         """
