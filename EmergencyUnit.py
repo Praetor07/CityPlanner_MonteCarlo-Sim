@@ -35,8 +35,8 @@ class EmergencyUnit:
         else:
             return 0, True, team_requirement
 
-
-    def allocate_teams_to_emergency(self, graph: nx.DiGraph, emergency: Emergency):
+    @staticmethod
+    def allocate_teams_to_emergency(graph: nx.DiGraph, emergency: Emergency):
         """
         Update current location to unit to location of emergency and store time after which unit becomes available.
         :return:
