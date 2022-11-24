@@ -13,6 +13,8 @@ def allocate_emergency_units(self, emergency_units: dict):
 if __name__ == '__main__':
     pop_densities = [2.4, 3.5, 0.9, 4.5]
     test = City(2, 2, pop_densities)
+    # for i in range(25):
+    #     e = Emergency(test, 3, [0.1, 0.1, 0.1, 0.1, 0.6])
     for i in range(1440):
         pass
         # e = Emergency(test)
