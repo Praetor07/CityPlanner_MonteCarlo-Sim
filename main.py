@@ -8,7 +8,10 @@ def allocate_emergency_units(self, emergency_units: dict):
     :param emergency_units:
     :return:
     """
-
+#population of each zones
+#emergency rate
+#scale of emergency
+#
 
 if __name__ == '__main__':
     pop_densities = [2.4, 3.5, 0.9, 4.5]
