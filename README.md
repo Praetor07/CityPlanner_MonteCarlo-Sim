@@ -15,9 +15,9 @@ This project is a Monte-Carlo simulation of a city with random emergency situati
 
 
 **Randomized Variables:**
-1) Time of Emergency: Randomizing the occurrence of emergencies with respect to time - probability distribution of emergency occurring at current time, with higher probability of during specific times of day (distribution derived from data)
-2) Location of Emergency: Randomizing the location coordinates of the emergency as a probability distribution of the population density of the zones
-3) Intensity of Emergency: Each emergency can have an intensity which is measured on a scale of 1 to 5, with 1 being the lowest intensity and 5 being the highest intensity. The number of emergency teams and the total time taken to resolve the emergency will be a function of the intensity of the emergency. The intensity of the emergency will be randomized on the discrete scale mentioned above.- probability distribution of intensity of emergency
+1) Time of Emergency: Randomizing the occurrence of emergencies with respect to time - probability distribution of one emergency occurring at current time in each zone is obtained using the poisson distribution modeled using a real dataset.
+2) Location of Emergency: Randomizing the location coordinates of the emergency within a zone using uniform distribution
+3) Intensity of Emergency: Each emergency can have an intensity which is measured on a scale of 1 to 5, with 1 being the lowest intensity and 5 being the highest intensity. The number of emergency teams and the total time taken to resolve the emergency will be a function of the intensity of the emergency. The intensity of the emergency will be randomized on the discrete scale mentioned above. Probabilities of each intensity will be user input, and as baseline input, a uniform distribution is considered.
 4) Traffic: Randomizing the traffic present along the different paths in the city as a probability distribution of the time and population density of the zone.  
 
 
