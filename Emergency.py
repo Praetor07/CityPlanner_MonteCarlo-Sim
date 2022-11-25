@@ -1,6 +1,7 @@
 import random
 import math
 import CityConfiguration
+from EmergencyUnit import EmergencyUnit
 from main import allocate_emergency_units
 
 class Emergency:
@@ -54,15 +55,16 @@ class Emergency:
         print(self.intensity)
         self.emergencies.append(self)
         self.city_of_emergency = city
+        self.requirement = self.intensity_mapping[self.intensity]['teams']
         self.resolve_emergency()
 
     def resolve_emergency(self):
-        emergency_units, time_taken_to_reach = allocate_emergency_units(self.intensity_mapping[self.intensity]['teams'])
+        emergency_units, time_taken_to_reach = EmergencyUnit.allocate_teams_to_emergency()
         time_to_resolve = time_taken_to_reach + self.intensity_mapping[self.intensity]['time']
         self.resolution_time = time_to_resolve
         total_time = time_to_resolve + time_taken_to_reach
         for _ in range(total_time):
             pass
-        for emergency_unit, num_teams in emergency_units:
-            emergency_unit.release_teams(num_teams)
+        for emergency_unit, num_teams in emergency_units.items():
+            emergency_unit.relieve_response_teams(num_teams)
 
