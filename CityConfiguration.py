@@ -13,6 +13,7 @@ class City:
         (this will be used to randomize zone of an emergency as a distribution of the population
         density and then determine a random coordinate within the zone)
         """
+        self.city_graph = None
         self.width = width
         self.height = height
         self.zone_populations = zone_populations
@@ -28,6 +29,28 @@ class City:
             else:
                 self.cumulative_sum_populations.append(self.coordinate_populations[i] +
                                                        self.cumulative_sum_populations[i - 1])
+
+    def build_city_graph(self):
+        # Modeling each zone using 9 nodes as a 3 x 3 set of nodes
+
+        ## Adding Nodes
+        self.city_graph = nx.DiGraph()
+        zone_num = -1
+        for i in range(3*self.height):
+            for j in range(3*self.width):
+                if (j == 0) or (j % 3 == 0):
+                    zone_num += 1
+                # print(zone_num)
+                self.city_graph.add_nodes_from([((i,j), {'Zone_Number': zone_num, 'Zone_Population':self.zone_populations[zone_num], 'Coord_Population':self.zone_populations[zone_num]/9})])
+            if (i == 0) or (i % 3 != 0):
+                zone_num -= self.width
+
+        ## Adding Edges
+        for (i,j) in self.city_graph.nodes:
+            self.city_graph.add_edge((i,j), (i,j+1))
+            self.city_graph.add_edge((i, j), (i+1, j))
+
+        return self.city_graph
 
     def update_graph_edges(self, time_of_day: int):
         """
