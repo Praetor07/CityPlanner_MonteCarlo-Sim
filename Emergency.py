@@ -1,8 +1,9 @@
 import random
 import math
-import CityConfiguration
+import networkx as nx
+from CityConfiguration import City
+from collections import defaultdict
 from EmergencyUnit import EmergencyUnit
-from main import allocate_emergency_units
 
 class Emergency:
     zone_dimension = 3
@@ -14,7 +15,7 @@ class Emergency:
     resolution_time_threshold = 25
     # Class variable - List containing time taken for resolution of each emergency
     emergencies = []
-    def __init__(self, city: CityConfiguration.City, zone: int):
+    def __init__(self, city: City, zone: int):
         """
         Initialize location and intensity of emergency using probability distributions.
         If location of emergency is same as that of emergency response unit, we assume a small time as
@@ -59,7 +60,7 @@ class Emergency:
         self.resolve_emergency()
 
     def resolve_emergency(self):
-        emergency_units, time_taken_to_reach = EmergencyUnit.allocate_teams_to_emergency()
+        emergency_units, time_taken_to_reach = EmergencyUnit.allocate_teams_to_emergency(self)
         time_to_resolve = time_taken_to_reach + self.intensity_mapping[self.intensity]['time']
         self.resolution_time = time_to_resolve
         total_time = time_to_resolve + time_taken_to_reach
@@ -67,4 +68,39 @@ class Emergency:
             pass
         for emergency_unit, num_teams in emergency_units.items():
             emergency_unit.relieve_response_teams(num_teams)
+
+
+    def allocate_teams_to_emergency(self):
+        """
+        Update current location to unit to location of emergency and store time after which unit becomes available.
+        :return:
+        """
+        graph = self.city_of_emergency.city_graph
+        emergency_requirement = self.requirement
+        node_to_emergency_details = defaultdict(dict)
+        response_time = 0  # seconds
+        number_of_units = 0
+        winner_nodes = defaultdict(dict)
+        for unit in EmergencyUnit.response_buildings:
+            if unit.available_capacity > 0:
+                node_to_emergency_details[unit]['capacity'] = unit.available_capacity
+                node_to_emergency_details[unit]['time'] = 1 if unit.location == self.location \
+                    else nx.algorithms.shortest_path_length(
+                    graph, unit.location, self.location, weight='adjusted_time', method='dijkstra')
+        sorted_node_to_emergency_details = {k: v for k, v in sorted(node_to_emergency_details.items(),
+                                                                    key=lambda item: (
+                                                                    item[1]['time'], -item[1]['capacity']))}
+        for response_unit in sorted_node_to_emergency_details:
+            emergency_requirement, available, teams_dispatched = response_unit.check_team_availability(
+                emergency_requirement)
+            if available:
+                response_time += sorted_node_to_emergency_details[response_unit]['time']
+                number_of_units += 1
+                response_unit.dispatch_teams(teams_dispatched)
+                winner_nodes[response_unit] = teams_dispatched
+            if emergency_requirement == 0:
+                break
+        avg_resp = response_time / number_of_units
+        # winner_criteria = 1 if avg_resp >= 15 else 0
+        return winner_nodes, avg_resp
 

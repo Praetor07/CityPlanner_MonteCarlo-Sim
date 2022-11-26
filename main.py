@@ -17,12 +17,14 @@ def allocate_emergency_units(self, emergency_units: dict):
 
 
 def poisson_probability(rate: float) -> float:
-    return rate * math.pow(math.e * (-1*rate))
+    return rate * math.pow(math.e, (-1*rate))
+
 
 if __name__ == '__main__':
     thread_list = []
     populations = [2400, 3500, 900, 4500]
-    test = City(2, 2, populations)
+    intensity_distributions = [0.2, 0.2, 0.2, 0.2, 0.2]
+    test = City(2, 2, populations, intensity_distributions)
     # for i in range(25):
     #     e = Emergency(test, 3, [0.1, 0.1, 0.1, 0.1, 0.6])
     seconds_in_a_day = 86400
@@ -30,6 +32,8 @@ if __name__ == '__main__':
     base_population = 200000
     base_rate_per_person = base_rate_for_emergency/base_population
     zone_probabilities = [poisson_probability(base_rate_per_person * pop) for pop in populations]
+    print(zone_probabilities)
+    exit()
     for i in range(seconds_in_a_day):
         for zone in range(len(zone_probabilities)):
             prob = zone_probabilities[zone]*1000000
