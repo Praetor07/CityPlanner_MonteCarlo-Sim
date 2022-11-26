@@ -1,6 +1,8 @@
+import math
+import random
 from Emergency import Emergency
 from CityConfiguration import City
-
+from threading import Thread
 
 def allocate_emergency_units(self, emergency_units: dict):
     """
@@ -13,13 +15,30 @@ def allocate_emergency_units(self, emergency_units: dict):
 #scale of emergency
 #
 
+
+def poisson_probability(rate: float):
+    return (rate * math.pow(math.e * (-1*rate)))
+
 if __name__ == '__main__':
-    pop_densities = [2.4, 3.5, 0.9, 4.5]
-    test = City(2, 2, pop_densities)
+    thread_list = []
+    populations = [2400, 3500, 900, 4500]
+    test = City(2, 2, populations)
     # for i in range(25):
     #     e = Emergency(test, 3, [0.1, 0.1, 0.1, 0.1, 0.6])
-    for i in range(1440):
-        pass
+    seconds_in_a_day = 86400
+    base_rate_for_emergency = 0.219
+    base_population = 200000
+    base_rate_per_person = base_rate_for_emergency/base_population
+    for i in range(seconds_in_a_day):
+        zone_rates = [poisson_probability(base_rate_per_person*pop) for pop in populations]
+        for zone in range(len(zone_rates)):
+            prob = zone_rates[zone]*1000000
+            if random.randint(0, 1000000) <= prob:
+                e = Emergency(test, zone)
+                th = Thread(target=e.resolve_emergency(), daemon=False)
+                th.start()
+                thread_list.append(th)
+
         # e = Emergency(test)
         #List of all the population densities
         #Scaling the emergency rate

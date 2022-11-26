@@ -3,7 +3,7 @@ import networkx as nx
 class City:
     # Class variable - represents size of each zone in terms of coordinates
     # Class variable - represents constant time between two adjacent nodes with no traffic between them
-    def __init__(self, width: int, height: int, population_densities: list):
+    def __init__(self, width: int, height: int, zone_populations: list, intensity_distribution: list):
         """
         Initialize a networkx graph where each node is a coordinate in the city, with its properties being zone number,
         population density of zone. Add edges between every pair or coordinates with the time property equal
@@ -15,18 +15,19 @@ class City:
         """
         self.width = width
         self.height = height
-        self.population_densities = population_densities
-        self.coordinate_pop_densities = []
-        for p in population_densities:
+        self.zone_populations = zone_populations
+        self.coordinate_populations = []
+        self.intensity_distribution = intensity_distribution
+        for i in range(len(zone_populations)):
             for _ in range(9): # number of nodes per zone?
-                self.coordinate_pop_densities.append(p)
-        self.cumulative_sum_densities = []
-        for i in range(len(self.coordinate_pop_densities)):
+                self.coordinate_populations.append(zone_populations[i]/9)
+        self.cumulative_sum_populations = []
+        for i in range(len(self.coordinate_populations)):
             if i == 0:
-                self.cumulative_sum_densities.append(self.coordinate_pop_densities[i])
+                self.cumulative_sum_populations.append(self.coordinate_populations[i])
             else:
-                self.cumulative_sum_densities.append(self.coordinate_pop_densities[i] +
-                                                     self.cumulative_sum_densities[i - 1])
+                self.cumulative_sum_populations.append(self.coordinate_populations[i] +
+                                                       self.cumulative_sum_populations[i - 1])
 
     def update_graph_edges(self, time_of_day: int):
         """

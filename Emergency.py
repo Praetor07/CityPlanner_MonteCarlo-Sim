@@ -14,7 +14,7 @@ class Emergency:
     resolution_time_threshold = 25
     # Class variable - List containing time taken for resolution of each emergency
     emergencies = []
-    def __init__(self, city: CityConfiguration.City, zone: int, intensity_distribution: list):
+    def __init__(self, city: CityConfiguration.City, zone: int):
         """
         Initialize location and intensity of emergency using probability distributions.
         If location of emergency is same as that of emergency response unit, we assume a small time as
@@ -40,13 +40,13 @@ class Emergency:
         c = loc % Emergency.zone_dimension
         self.location = ((zone_row*Emergency.zone_dimension) + r, (zone_col*Emergency.zone_dimension) + c)
         # print(self.location)
-        self.intensity_distribution = [int(intensity*100) for intensity in intensity_distribution]
+        intensity_distribution = [int(intensity*100) for intensity in self.city_of_emergency.intensity_distribution]
         self.intensity_cumulative = []
-        for i in range(len(self.intensity_distribution)):
+        for i in range(len(intensity_distribution)):
             if i == 0:
-                self.intensity_cumulative.append(self.intensity_distribution[i])
+                self.intensity_cumulative.append(intensity_distribution[i])
             else:
-                self.intensity_cumulative.append(self.intensity_cumulative[-1] + self.intensity_distribution[i])
+                self.intensity_cumulative.append(self.intensity_cumulative[-1] + intensity_distribution[i])
         rand = random.randint(1, self.intensity_cumulative[-1])
         for i in range(len(self.intensity_cumulative)):
             if rand <= self.intensity_cumulative[i]:
