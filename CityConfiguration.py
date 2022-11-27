@@ -1,6 +1,9 @@
 import networkx as nx
+import numpy as np
+
 
 class City:
+    zone_dimension = 3
     # Class variable - represents size of each zone in terms of coordinates
     # Class variable - represents constant time between two adjacent nodes with no traffic between them
     def __init__(self, width: int, height: int, zone_populations: list, intensity_distribution: list):
@@ -19,16 +22,17 @@ class City:
         self.zone_populations = zone_populations
         self.coordinate_populations = []
         self.intensity_distribution = intensity_distribution
+        self.intensity_cumulative = np.cumsum(np.rint(np.asarray(self.intensity_distribution)))
         for i in range(len(zone_populations)):
-            for _ in range(9): # number of nodes per zone?
-                self.coordinate_populations.append(zone_populations[i]/9)
-        self.cumulative_sum_populations = []
-        for i in range(len(self.coordinate_populations)):
-            if i == 0:
-                self.cumulative_sum_populations.append(self.coordinate_populations[i])
-            else:
-                self.cumulative_sum_populations.append(self.coordinate_populations[i] +
-                                                       self.cumulative_sum_populations[i - 1])
+            for _ in range(City.zone_dimension ** 2):# number of nodes per zone?
+                self.coordinate_populations.append(zone_populations[i]/(City.zone_dimension ** 2))
+        # self.cumulative_sum_populations = []
+        # for i in range(len(self.coordinate_populations)):
+        #     if i == 0:
+        #         self.cumulative_sum_populations.append(self.coordinate_populations[i])
+        #     else:
+        #         self.cumulative_sum_populations.append(self.coordinate_populations[i] +
+        #                                                self.cumulative_sum_populations[i - 1])
 
     def build_city_graph(self):
         # Modeling each zone using 9 nodes as a 3 x 3 set of nodes
