@@ -3,6 +3,7 @@ import random
 from Emergency import Emergency
 from CityConfiguration import City
 from threading import Thread
+import numpy as np
 
 def allocate_emergency_units(self, emergency_units: dict):
     """

@@ -1,5 +1,5 @@
-import networkx as nx
 import numpy as np
+import networkx as nx
 
 class City:
     zone_dimension = 3
@@ -15,7 +15,7 @@ class City:
         (this will be used to randomize zone of an emergency as a distribution of the population
         density and then determine a random coordinate within the zone)
         """
-        self.city_graph = None
+        self.city_graph = nx.DiGraph()
         self.width = width
         self.height = height
         self.zone_populations = zone_populations
