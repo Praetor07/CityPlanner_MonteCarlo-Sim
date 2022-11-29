@@ -25,6 +25,7 @@ class City:
         for i in range(len(zone_populations)):
             for _ in range(City.zone_dimension ** 2):# number of nodes per zone?
                 self.coordinate_populations.append(zone_populations[i]/(City.zone_dimension ** 2))
+        self.build_city_graph()
 
     def build_city_graph(self):
         # Modeling each zone using 9 nodes as a 3 x 3 set of nodes
