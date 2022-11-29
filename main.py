@@ -29,7 +29,7 @@ if __name__ == '__main__':
     city = test.build_city_graph()
     # print(city.nodes)
     # print(city.nodes[(0,0)]['Coord_Population'])
-    print(city.edges)
+    # print(city.edges)
 
     # for i in range(25):
     #     e = Emergency(test, 3, [0.1, 0.1, 0.1, 0.1, 0.6])
@@ -38,7 +38,7 @@ if __name__ == '__main__':
     base_population = 200000
     base_rate_per_person = base_rate_for_emergency/base_population
     zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(populations))
-    print(zone_probabilities)
+    # print(zone_probabilities)
     # exit()
     for i in range(seconds_in_a_day):
         for zone in range(zone_probabilities.shape[0]):
@@ -48,7 +48,7 @@ if __name__ == '__main__':
                 th = Thread(target=e.resolve_emergency(), daemon=False)
                 th.start()
                 thread_list.append(th)
-
+    
         # e = Emergency(test)
         #List of all the population densities
         #Scaling the emergency rate

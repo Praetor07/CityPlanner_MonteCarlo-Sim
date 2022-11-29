@@ -51,7 +51,7 @@ class City:
         self.zone_populations = zone_populations
         self.coordinate_populations = []
         self.intensity_distribution = intensity_distribution
-        self.intensity_cumulative = np.cumsum(np.rint(np.asarray(self.intensity_distribution)))
+        self.intensity_cumulative = np.cumsum(np.rint(np.asarray(self.intensity_distribution)*100))
         for i in range(len(zone_populations)):
             for _ in range(City.zone_dimension ** 2):  # number of nodes per zone?
                 self.coordinate_populations.append(zone_populations[i] / (City.zone_dimension ** 2))

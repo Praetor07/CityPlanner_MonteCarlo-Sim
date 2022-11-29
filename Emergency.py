@@ -39,6 +39,7 @@ class Emergency:
         r = math.floor(loc/City.zone_dimension)
         c = loc % City.zone_dimension
         self.location = ((zone_row*City.zone_dimension) + r, (zone_col*City.zone_dimension) + c)
+        print(city.intensity_cumulative)
         # print(self.location)
         # intensity_distribution = [int(intensity*100) for intensity in self.city_of_emergency.intensity_distribution]
         # for i in range(len(intensity_distribution)):
@@ -51,7 +52,7 @@ class Emergency:
             if rand <= city.intensity_cumulative[i]:
                 self.intensity = i + 1
                 break
-        print(self.intensity)
+        # print(self.intensity)
         self.city_of_emergency = city
         self.requirement = Emergency.intensity_mapping[self.intensity]['teams']
         Emergency.emergencies.append(self)
@@ -73,7 +74,7 @@ class Emergency:
         Update current location to unit to location of emergency and store time after which unit becomes available.
         :return:
         """
-        with self.lock:
+        if True:
             graph = self.city_of_emergency.city_graph
             emergency_requirement = self.requirement
             node_to_emergency_details = defaultdict(dict)
