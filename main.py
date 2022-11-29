@@ -2,8 +2,10 @@ import math
 import random
 from Emergency import Emergency
 from CityConfiguration import City
+from EmergencyUnit import EmergencyUnit
 from threading import Thread
 import numpy as np
+import networkx as nx
 
 def allocate_emergency_units(self, emergency_units: dict):
     """
@@ -27,6 +29,11 @@ if __name__ == '__main__':
     intensity_distributions = [0.2, 0.2, 0.2, 0.2, 0.2]
     test = City(2, 2, populations, intensity_distributions)
     city = test.build_city_graph()
+    nx.draw(test.city_graph, with_labels=True)
+    e1 = EmergencyUnit(3, (1, 1))
+    e2 = EmergencyUnit(3, (1, 4))
+    e3 = EmergencyUnit(3, (4, 1))
+    e4 = EmergencyUnit(3, (4, 4))
     # print(city.nodes)
     # print(city.nodes[(0,0)]['Coord_Population'])
     # print(city.edges)
@@ -48,7 +55,10 @@ if __name__ == '__main__':
                 th = Thread(target=e.resolve_emergency(), daemon=False)
                 th.start()
                 thread_list.append(th)
-    
+    resp_times = []
+    for time in Emergency.emergencies:
+        resp_times.append(time)
+    print(np.sum(np.asarray(resp_times))/len(resp_times))
         # e = Emergency(test)
         #List of all the population densities
         #Scaling the emergency rate

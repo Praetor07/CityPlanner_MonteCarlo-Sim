@@ -6,7 +6,7 @@ from CityConfiguration import City
 class EmergencyUnit:
     # Class variable - List of all emergency units (all objects of class)
     response_buildings = []
-    def __init__(self, size: int, location: str = None):
+    def __init__(self, size: int, location: tuple):
         """
         Initialize size and location of the emergency unit, along with number of teams currently available
         :param size:
