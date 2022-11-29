@@ -33,7 +33,8 @@ def mod_pert_random(low, likely, high, confidence=4, samples=1):
 
 class City:
     zone_dimension = 3
-
+    traffic_time_weights = {0:0, 1:2, 2:2, 3:1}
+    default_commute_time = 10
     # Class variable - represents size of each zone in terms of coordinates
     # Class variable - represents constant time between two adjacent nodes with no traffic between them
     def __init__(self, width: int, height: int, zone_populations: list, intensity_distribution: list):
@@ -48,7 +49,7 @@ class City:
         """
         self.width = width
         self.height = height
-        self.zone_populations = zone_populations
+        self.zone_populations = np.asarray(zone_populations)
         self.coordinate_populations = []
         self.intensity_distribution = intensity_distribution
         self.intensity_cumulative = np.cumsum(np.rint(np.asarray(self.intensity_distribution)*100))
@@ -58,6 +59,7 @@ class City:
 
         self.city_graph = nx.Graph()
         self.build_city_graph()
+        self.likely_vals = self.zone_populations / np.sum(self.zone_populations)
         # 0,0   0,1   0,2   0,3   0,4   0,5
         # 1,0   1,1   1,2   1,3   1,4   1,5
         # 2,0   2,1   2,2   2,3   2,4   2,5
@@ -65,18 +67,16 @@ class City:
         # 4,0   4,1   4,2   4,3   4,4   4,5
         # 5,0   5,1   5,2   5,3   5,4   5,5
 
-    def get_commute_time(self, time_of_day: int, zone_pop: int, city_pop: int):
+    def get_commute_time(self, source_node: tuple, dest_node: tuple, time_weight: int):
         """
         Calculates the commute time based on time of day and the zone population
         :param time_of_day: Time of day during the simulation
-        :param zone_pop: Average population of the zones involved in the commute
-        :param city_pop:
         :return:
         """
-        likely_val = zone_pop / city_pop
-        traffic_time = mod_pert_random(low=0, likely=likely_val, high=1, samples=1)
-        traffic_time *= time_of_day
-        commute_time = 10 + traffic_time
+        likely = 0.5 * (self.likely_vals[self.city_graph.nodes[source_node]['Zone_Number']] + self.likely_vals[self.city_graph.nodes[dest_node]['Zone_Number']])
+        traffic_time = mod_pert_random(low=0, likely=likely, high=1, samples=1)
+        traffic_time *= time_weight
+        commute_time = City.default_commute_time + City.default_commute_time * traffic_time
         return commute_time
 
     def build_city_graph(self):
@@ -100,19 +100,20 @@ class City:
         nodes = list(self.city_graph.nodes)
         for (i, j) in nodes:
             if self.city_graph.has_node((i, j + 1)):
-                self.city_graph.add_edge((i, j), (i, j + 1), adjusted_time=10)
+                self.city_graph.add_edge((i, j), (i, j + 1), adjusted_time=City.default_commute_time)
             if self.city_graph.has_node((i + 1, j)):
-                self.city_graph.add_edge((i, j), (i + 1, j), adjusted_time=10)
+                self.city_graph.add_edge((i, j), (i + 1, j), adjusted_time=City.default_commute_time)
 
-    def update_graph_edges(self, time_of_day: int, zone_pop: int, city_pop: int):
+    def update_graph_edges(self, time_of_day: int):
         """
         Update graph edges which is constant + traffic parameter
         :param time_of_day:
         :return:
         """
         for (i, j) in self.city_graph.nodes:
-            travel_time = self.get_commute_time(time_of_day, zone_pop, city_pop)
             if self.city_graph.has_node((i, j + 1)):
-                self.city_graph[(i, j)][(i, j + 1)]['adjusted_time'] = travel_time
+                commute_time = self.get_commute_time((i, j), (i, j+1), City.traffic_time_weights[time_of_day])
+                self.city_graph[(i, j)][(i, j + 1)]['adjusted_time'] = commute_time
             if self.city_graph.has_node((i + 1, j)):
-                self.city_graph[(i, j)][(i + 1, j)]['adjusted_time'] = travel_time
+                commute_time = self.get_commute_time((i, j), (i+1, j), City.traffic_time_weights[time_of_day])
+                self.city_graph[(i, j)][(i + 1, j)]['adjusted_time'] = commute_time

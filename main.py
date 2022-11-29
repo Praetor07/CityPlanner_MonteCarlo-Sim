@@ -28,7 +28,7 @@ if __name__ == '__main__':
     populations = [2400, 3500, 900, 4500]
     intensity_distributions = [0.2, 0.2, 0.2, 0.2, 0.2]
     test = City(2, 2, populations, intensity_distributions)
-    city = test.build_city_graph()
+    test.build_city_graph()
     print(test.city_graph.nodes)
     # nx.draw(test.city_graph, with_labels=True)
     e1 = EmergencyUnit(3, (1, 1))
