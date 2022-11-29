@@ -48,7 +48,7 @@ if __name__ == '__main__':
     zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(populations))
     # print(zone_probabilities)
     # exit()
-    avg_resp_times = []
+    aggregate_resp_times = []
     for run in range(1, 101):
         for i in range(seconds_in_a_day):
             if i in [21599, 43119, 64799]:
@@ -62,18 +62,20 @@ if __name__ == '__main__':
                     thread_list.append(th)
         for th in thread_list:
             th.join()
-        resp_times = []
+        resp_times = list()
         for emergency in Emergency.emergencies:
-            resp_times.append(emergency.resolution_time)
+            resp_times.append(emergency.time_to_respond)
+        print("{}".format(run))
         avg = np.mean(np.asarray(resp_times))
         if run == 1:
-            avg_resp_times.append(avg)
+            aggregate_resp_times.append(avg)
         else:
-            sum_until_now = avg_resp_times[-1] * len(avg_resp_times)
+            sum_until_now = aggregate_resp_times[-1] * len(aggregate_resp_times)
             avg = (sum_until_now+avg)/run
-            avg_resp_times.append(avg)
+            aggregate_resp_times.append(avg)
         Emergency.clear_emergencies()
-    for avg in avg_resp_times:
+        # print(run)
+    for avg in aggregate_resp_times:
         print(avg)
         # e = Emergency(test)
         #List of all the population densities

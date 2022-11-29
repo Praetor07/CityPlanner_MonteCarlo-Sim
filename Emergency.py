@@ -30,7 +30,7 @@ class Emergency:
         # zone = math.floor(loc/9)
         # print(loc)
         # print(zone)
-        self.resolution_time = None
+        self.time_to_respond = None
         zone_row = zone % city.height
         zone_col = math.floor(zone/city.height)
         # print(zone_row)
@@ -60,10 +60,9 @@ class Emergency:
 
     def resolve_emergency(self):
         emergency_units, time_taken_to_reach = self.allocate_teams_to_emergency()
-        time_to_resolve = time_taken_to_reach + Emergency.intensity_mapping[self.intensity]['time']
-        self.resolution_time = time_to_resolve
-        total_time = time_to_resolve + time_taken_to_reach
-        for _ in range(int(total_time)*60):
+        time_to_resolve = time_taken_to_reach + Emergency.intensity_mapping[self.intensity]['time'] + time_taken_to_reach
+        self.time_to_respond = float(time_taken_to_reach)
+        for _ in range(int(time_to_resolve)*60):
             pass
         for emergency_unit, num_teams in emergency_units.items():
             emergency_unit.relieve_response_teams(num_teams)
@@ -105,5 +104,5 @@ class Emergency:
             return winner_nodes, avg_resp
 
     @staticmethod
-    def clear_emergencies(self):
+    def clear_emergencies():
         Emergency.emergencies = []
