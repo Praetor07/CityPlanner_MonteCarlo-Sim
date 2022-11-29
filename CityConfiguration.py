@@ -38,7 +38,7 @@ class City:
                 # print(zone_num)
                 self.city_graph.add_nodes_from([((i, j), {'Zone_Number': zone_num,
                                                           'Zone_Population': self.zone_populations[zone_num],
-                                                          'Coord_Population': self.zone_populations[zone_num] / 9})])
+                                                          'Coord_Population': self.zone_populations[zone_num] / City.zone_dimension**2})])
             if (i == 0) or (i % City.zone_dimension != 0):
                 zone_num -= self.width
 
