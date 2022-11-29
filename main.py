@@ -29,7 +29,8 @@ if __name__ == '__main__':
     intensity_distributions = [0.2, 0.2, 0.2, 0.2, 0.2]
     test = City(2, 2, populations, intensity_distributions)
     city = test.build_city_graph()
-    nx.draw(test.city_graph, with_labels=True)
+    print(test.city_graph.nodes)
+    # nx.draw(test.city_graph, with_labels=True)
     e1 = EmergencyUnit(3, (1, 1))
     e2 = EmergencyUnit(3, (1, 4))
     e3 = EmergencyUnit(3, (4, 1))
@@ -48,6 +49,8 @@ if __name__ == '__main__':
     # print(zone_probabilities)
     # exit()
     for i in range(seconds_in_a_day):
+        if i in [21599, 43119, 64799]:
+            test.update_graph_edges()
         for zone in range(zone_probabilities.shape[0]):
             prob = zone_probabilities[zone]*1000000
             if random.randint(1, 1000000) <= prob:
@@ -56,8 +59,8 @@ if __name__ == '__main__':
                 th.start()
                 thread_list.append(th)
     resp_times = []
-    for time in Emergency.emergencies:
-        resp_times.append(time)
+    for emergency in Emergency.emergencies:
+        resp_times.append(emergency.resolution_time)
     print(np.sum(np.asarray(resp_times))/len(resp_times))
         # e = Emergency(test)
         #List of all the population densities

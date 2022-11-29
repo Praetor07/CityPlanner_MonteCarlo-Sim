@@ -39,7 +39,7 @@ class Emergency:
         r = math.floor(loc/City.zone_dimension)
         c = loc % City.zone_dimension
         self.location = ((zone_row*City.zone_dimension) + r, (zone_col*City.zone_dimension) + c)
-        print(city.intensity_cumulative)
+        # print(city.intensity_cumulative)
         # print(self.location)
         # intensity_distribution = [int(intensity*100) for intensity in self.city_of_emergency.intensity_distribution]
         # for i in range(len(intensity_distribution)):
@@ -63,7 +63,7 @@ class Emergency:
         time_to_resolve = time_taken_to_reach + Emergency.intensity_mapping[self.intensity]['time']
         self.resolution_time = time_to_resolve
         total_time = time_to_resolve + time_taken_to_reach
-        for _ in range(total_time):
+        for _ in range(int(total_time)*60):
             pass
         for emergency_unit, num_teams in emergency_units.items():
             emergency_unit.relieve_response_teams(num_teams)

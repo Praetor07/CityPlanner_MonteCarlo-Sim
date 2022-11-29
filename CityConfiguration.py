@@ -56,7 +56,7 @@ class City:
             for _ in range(City.zone_dimension ** 2):  # number of nodes per zone?
                 self.coordinate_populations.append(zone_populations[i] / (City.zone_dimension ** 2))
 
-        self.city_graph = nx.DiGraph()
+        self.city_graph = nx.Graph()
         self.build_city_graph()
         # 0,0   0,1   0,2   0,3   0,4   0,5
         # 1,0   1,1   1,2   1,3   1,4   1,5
