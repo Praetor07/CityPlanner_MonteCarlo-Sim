@@ -117,5 +117,10 @@ class City:
         :param time_of_day:
         :return:
         """
-        self.city_graph
+        for (i, j) in self.city_graph.nodes:
+            travel_time = self.get_commute_time(time_of_day, zone_pop, city_pop)
+            if self.city_graph.has_node((i, j + 1)):
+                self.city_graph[(i, j)][(i, j+1)]['adjusted_time'] = travel_time
+            if self.city_graph.has_node((i + 1, j)):
+                self.city_graph[(i, j)][(i + 1, j)]['adjusted_time'] = travel_time
 
