@@ -34,7 +34,7 @@ def mod_pert_random(low, likely, high, confidence=4, samples=1):
 class City:
     zone_dimension = 3
     traffic_time_weights = {0:0, 1:2, 2:2, 3:1}
-    default_commute_time = 10
+    default_commute_time = 3
     # Class variable - represents size of each zone in terms of coordinates
     # Class variable - represents constant time between two adjacent nodes with no traffic between them
     def __init__(self, width: int, height: int, zone_populations: list, intensity_distribution: list):
