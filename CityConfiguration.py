@@ -1,4 +1,5 @@
 import networkx as nx
+import numpy as np
 
 class City:
     zone_dimension = 3
@@ -24,28 +25,21 @@ class City:
         for i in range(len(zone_populations)):
             for _ in range(City.zone_dimension ** 2):# number of nodes per zone?
                 self.coordinate_populations.append(zone_populations[i]/(City.zone_dimension ** 2))
-        # self.cumulative_sum_populations = []
-        # for i in range(len(self.coordinate_populations)):
-        #     if i == 0:
-        #         self.cumulative_sum_populations.append(self.coordinate_populations[i])
-        #     else:
-        #         self.cumulative_sum_populations.append(self.coordinate_populations[i] +
-        #                                                self.cumulative_sum_populations[i - 1])
 
     def build_city_graph(self):
         # Modeling each zone using 9 nodes as a 3 x 3 set of nodes
 
         ## Adding Nodes
         zone_num = -1
-        for i in range(3 * self.height):
-            for j in range(3 * self.width):
-                if (j == 0) or (j % 3 == 0):
+        for i in range(City.zone_dimension * self.height):
+            for j in range(City.zone_dimension * self.width):
+                if (j == 0) or (j % City.zone_dimension == 0):
                     zone_num += 1
                 # print(zone_num)
                 self.city_graph.add_nodes_from([((i, j), {'Zone_Number': zone_num,
                                                           'Zone_Population': self.zone_populations[zone_num],
                                                           'Coord_Population': self.zone_populations[zone_num] / 9})])
-            if (i == 0) or (i % 3 != 0):
+            if (i == 0) or (i % City.zone_dimension != 0):
                 zone_num -= self.width
 
         ## Adding Edges
