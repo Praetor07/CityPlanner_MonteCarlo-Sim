@@ -104,3 +104,6 @@ class Emergency:
             # winner_criteria = 1 if avg_resp >= 15 else 0
             return winner_nodes, avg_resp
 
+    @staticmethod
+    def clear_emergencies(self):
+        Emergency.emergencies = []

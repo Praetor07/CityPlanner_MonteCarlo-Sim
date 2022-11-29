@@ -48,20 +48,33 @@ if __name__ == '__main__':
     zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(populations))
     # print(zone_probabilities)
     # exit()
-    for i in range(seconds_in_a_day):
-        if i in [21599, 43119, 64799]:
-            test.update_graph_edges()
-        for zone in range(zone_probabilities.shape[0]):
-            prob = zone_probabilities[zone]*1000000
-            if random.randint(1, 1000000) <= prob:
-                e = Emergency(test, zone)
-                th = Thread(target=e.resolve_emergency(), daemon=False)
-                th.start()
-                thread_list.append(th)
-    resp_times = []
-    for emergency in Emergency.emergencies:
-        resp_times.append(emergency.resolution_time)
-    print(np.sum(np.asarray(resp_times))/len(resp_times))
+    avg_resp_times = []
+    for run in range(1, 101):
+        for i in range(seconds_in_a_day):
+            if i in [21599, 43119, 64799]:
+                test.update_graph_edges(math.floor((i+1)/21600))
+            for zone in range(zone_probabilities.shape[0]):
+                prob = zone_probabilities[zone]*1000000
+                if random.randint(1, 1000000) <= prob:
+                    e = Emergency(test, zone)
+                    th = Thread(target=e.resolve_emergency(), daemon=False)
+                    th.start()
+                    thread_list.append(th)
+        for th in thread_list:
+            th.join()
+        resp_times = []
+        for emergency in Emergency.emergencies:
+            resp_times.append(emergency.resolution_time)
+        avg = np.mean(np.asarray(resp_times))
+        if run == 1:
+            avg_resp_times.append(avg)
+        else:
+            sum_until_now = avg_resp_times[-1] * len(avg_resp_times)
+            avg = (sum_until_now+avg)/run
+            avg_resp_times.append(avg)
+        Emergency.clear_emergencies()
+    for avg in avg_resp_times:
+        print(avg)
         # e = Emergency(test)
         #List of all the population densities
         #Scaling the emergency rate
