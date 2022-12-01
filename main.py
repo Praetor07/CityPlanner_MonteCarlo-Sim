@@ -5,47 +5,96 @@ from CityConfiguration import City
 from EmergencyUnit import EmergencyUnit
 from threading import Thread
 import numpy as np
-import networkx as nx
-
-def allocate_emergency_units(self, emergency_units: dict):
-    """
-    Determine optimal available emergency units to be allocated to resolve the emergency.
-    :param emergency_units:
-    :return:
-    """
-#population of each zones
-#emergency rate
-#scale of emergency
-#
-
+import pandas as pd
 
 def poisson_probability(rates: np.array) -> np.array:
     return rates * np.exp(-1*rates)
 
 
+def configure_city():
+    try:
+        print("Welcome to the Emergency Response Monte-Carlo Simulation. You will have to configure the city\n"
+              "in terms of its dimensions, populations, probability of each intensity type occurring in the 5-point emergency\n"
+              "intensity scale (depending on the nature of the city you are designing), and the locations of the emergency\n"
+              "unit buildings within the city")
+        print("First, you will need to configure the city width and height in terms of the zone unit, where each zone\n"
+              "represents a 3X3 square consisting of 9 coordinates")
+        width = int(input("Enter the width of the city in terms of number of zones: "))
+        if width <= 0:
+            raise ValueError()
+        height = int(input("Enter the height of the city in terms of number of zones: "))
+        if height <= 0:
+            raise ValueError()
+        print("Now, configure the population of each zone column-wise, assuming that the population is uniformly\n"
+              "distributed within each zone.")
+        populations = np.empty(width*height)
+        for zone in range(width*height):
+            populations[zone] = int(input("Enter the population of zone {}: ".format(zone)))
+        print("Now, configure the probability of each intensity type of, given that an emergency has occurred -\n"
+              "with intensities measured on a scale of 1 to 5 where 1 is the lowest and 5 is the highest\n"
+              "For example, if every intensity type is equally likely, then the probabilities for each intensity\n"
+              "type would be 0.2. Ensure that the provided probabilities add up to exactly 1.")
+        intensity_distributions = np.empty(5)
+        while True:
+            for intensity in range(1, 6):
+                intensity_distributions[intensity-1] = float(input("Enter the probability of the emergency being of intensity {}, given that an emergency has occurred: ".format(intensity)))
+            if np.sum(intensity_distributions) != 1.0:
+                print("Please ensure that the probabilities add up to exactly 1.")
+            else:
+                break
+        city_configured = City(width, height, populations, intensity_distributions)
+        print("Now, configure the types and locations of the emergency unit buildings within the city.\n"
+              "There are three types of emergency unit buildings - small buildings each housing 1 emergency response team,\n"
+              "medium buildings each housing 3 emergency response teams, and large buildings each housing 5 emergency response teams.")
+        while True:
+            small_count = int(input("Enter the number of small emergency unit buildings: "))
+            medium_count = int(input("Enter the number of medium emergency unit buildings: "))
+            large_count = int(input("Enter the number of large emergency unit buildings: "))
+            if small_count + medium_count + large_count == 0:
+                print("Please ensure that there is atleast one emergency unit building")
+            else:
+                break
+        for size in range(3):
+            if size == 0:
+                limit = small_count
+                building_type = 'small'
+            elif size == 1:
+                limit = medium_count
+                building_type = 'medium'
+            else:
+                limit = large_count
+                building_type = 'large'
+            for i in range(1, limit+1):
+                while True:
+                    x = int(input("Enter the x-coordinate of {} building {}: ".format(building_type, i)))
+                    y = int(input("Enter the y-coordinate of {} building {}: ".format(building_type, i)))
+                    if not city_configured.check_coordinates(x, y):
+                        print("Please enter valid coordinates according to the city configured.")
+                    else:
+                        EmergencyUnit(building_type, (x, y))
+                        break
+        return city_configured
+    except ValueError:
+        print("Please enter only numeric values.")
+
 if __name__ == '__main__':
     thread_list = []
-    populations = [2400, 3500, 900, 4500]
-    intensity_distributions = [0.2, 0.2, 0.2, 0.2, 0.2]
-    test = City(2, 2, populations, intensity_distributions)
-    test.build_city_graph()
-    print(test.city_graph.nodes)
+    # populations = [2400, 3500, 900, 4500]
+    # intensity_distributions = [0.2, 0.2, 0.2, 0.2, 0.2]
+    # test = City(2, 2, populations, intensity_distributions)
+    # test.build_city_graph()
+    # print(test.city_graph.nodes)
     # nx.draw(test.city_graph, with_labels=True)
-    e1 = EmergencyUnit(3, (1, 1))
-    e2 = EmergencyUnit(3, (1, 4))
-    e3 = EmergencyUnit(3, (4, 1))
-    e4 = EmergencyUnit(3, (4, 4))
-    # print(city.nodes)
-    # print(city.nodes[(0,0)]['Coord_Population'])
-    # print(city.edges)
-
-    # for i in range(25):
-    #     e = Emergency(test, 3, [0.1, 0.1, 0.1, 0.1, 0.6])
+    # e1 = EmergencyUnit(3, (1, 1))
+    # e2 = EmergencyUnit(3, (1, 4))
+    # e3 = EmergencyUnit(3, (4, 1))
+    # e4 = EmergencyUnit(3, (4, 4))
+    test = configure_city()
     seconds_in_a_day = 86400
     base_rate_for_emergency = 0.219
     base_population = 200000
     base_rate_per_person = base_rate_for_emergency/base_population
-    zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(populations))
+    zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(test.zone_populations))
     # print(zone_probabilities)
     # exit()
     aggregate_resp_times = []
@@ -62,6 +111,7 @@ if __name__ == '__main__':
                     thread_list.append(th)
         for th in thread_list:
             th.join()
+        thread_list = []
         resp_times = list()
         for emergency in Emergency.emergencies:
             resp_times.append(emergency.time_to_respond)
@@ -74,17 +124,7 @@ if __name__ == '__main__':
             avg = (sum_until_now+avg)/run
             aggregate_resp_times.append(avg)
         Emergency.clear_emergencies()
-        # print(run)
+    df = pd.DataFrame({'Average Response Time': aggregate_resp_times})
+    df.plot()
     for avg in aggregate_resp_times:
         print(avg)
-        # e = Emergency(test)
-        #List of all the population densities
-        #Scaling the emergency rate
-        #feed all values into the poisson distribution to get the probabilities
-        #based on the probabilities decide if emergency occurs [0/1 array]
-        #randomize location in that zone for the emergency
-        #run algo further
-    # Take input of city zone configuration -
-    # For loop for one day- each iteration represents 1 unit of time (ex: 1 minute)
-        # Within one day - time parameter between edges is updated by changing traffic penalty parameter
-        # (which is a function of time and population density) - graph edges are updates 4 times a day

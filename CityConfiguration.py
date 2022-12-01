@@ -60,6 +60,7 @@ class City:
         self.city_graph = nx.Graph()
         self.build_city_graph()
         self.likely_vals = self.zone_populations / np.sum(self.zone_populations)
+        self.build_city_graph()
         # 0,0   0,1   0,2   0,3   0,4   0,5
         # 1,0   1,1   1,2   1,3   1,4   1,5
         # 2,0   2,1   2,2   2,3   2,4   2,5
@@ -117,3 +118,9 @@ class City:
             if self.city_graph.has_node((i + 1, j)):
                 commute_time = self.get_commute_time((i, j), (i+1, j), City.traffic_time_weights[time_of_day])
                 self.city_graph[(i, j)][(i + 1, j)]['adjusted_time'] = commute_time
+
+    def check_coordinates(self, x, y):
+        if x < self.width*3 and y < self.height*3:
+            return True
+        else:
+            return False

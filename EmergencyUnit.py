@@ -6,6 +6,7 @@ from CityConfiguration import City
 class EmergencyUnit:
     # Class variable - List of all emergency units (all objects of class)
     response_buildings = []
+    type_to_capacity_mapping = {'small': 1, 'medium': 2, 'large': 3}
     def __init__(self, size: int, location: tuple):
         """
         Initialize size and location of the emergency unit, along with number of teams currently available
@@ -13,7 +14,7 @@ class EmergencyUnit:
         :param location:
         """
         self.location = location
-        self.available_capacity = size
+        self.available_capacity = EmergencyUnit.type_to_capacity_mapping[size]
         EmergencyUnit.response_buildings.append(self)
 
     def relieve_response_teams(self, relieved_units):
