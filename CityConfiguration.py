@@ -122,7 +122,19 @@ class City:
         1
         >>> ((0, 0), (1, 1)) in list(city.city_graph.edges)
         False
-        >>>
+        >>> ((1, 2), (1, 3)) in list(city.city_graph.edges)
+        True
+        >>> ((1, 2), (1, 4)) in list(city.city_graph.edges)
+        False
+        >>> zone_dict = {}
+        >>> for (r, c) in list(city.city_graph.nodes):
+        ...     zone = city.city_graph.nodes[(r, c)]['Zone_Number']
+        ...     if zone in zone_dict:
+        ...         zone_dict[zone] += 1
+        ...     else:
+        ...         zone_dict[zone] = 1
+        >>> set(zone_dict.values()) == {City.zone_dimension**2}
+        True
         """
 
         # Adding Nodes
