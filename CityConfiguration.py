@@ -112,9 +112,17 @@ class City:
         go traverse between adjacent node has been set to the default value specified as class variable.
         :return: None. Modifies graph object in place
 
-        >>>city =  City(2, 1, [400, 800], [0.4, 0.2, 0.2, 0.1, 0.1])
-        >>>city.build_city_graph()
-        >>>city.city_graph.nodes
+        >>> city =  City(2, 1, [400, 800], [0.4, 0.2, 0.2, 0.1, 0.1])
+        >>> city.build_city_graph()
+        >>> truth = True
+        >>> for (r, c) in list(city.city_graph.nodes):
+        ...     val = city.check_coordinates(r, c)
+        ...     truth *= val
+        >>> truth
+        1
+        >>> ((0, 0), (1, 1)) in list(city.city_graph.edges)
+        False
+        >>>
         """
 
         # Adding Nodes
@@ -153,7 +161,7 @@ class City:
                 self.city_graph[(i, j)][(i + 1, j)]['adjusted_time'] = commute_time
 
     def check_coordinates(self, x, y):
-        if x < self.width*3 and y < self.height*3:
+        if y < self.width*City.zone_dimension and x < self.height*City.zone_dimension:
             return True
         else:
             return False
