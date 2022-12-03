@@ -33,7 +33,7 @@ def mod_pert_random(low, likely, high, confidence=4, samples=1):
 
 class City:
     zone_dimension = 3
-    traffic_time_weights = {0:0, 1:2, 2:2, 3:1}
+    traffic_time_weights = {0: 0, 1: 2, 2: 2, 3: 1}
     default_commute_time = 3
     # Class variable - represents size of each zone in terms of coordinates
     # Class variable - represents constant time between two adjacent nodes with no traffic between them
@@ -70,26 +70,79 @@ class City:
 
     def get_commute_time(self, source_node: tuple, dest_node: tuple, time_weight: int):
         """
-        Calculates the commute time based on time of day and the zone population
-        :param time_of_day: Time of day during the simulation
-        :return:
+        Calculates the commute time based on time of day and the zone population. Source and Destination
+        node must have a direct edge between them
+        :param source_node: Node from which commute starts
+        :param dest_node: Node at which commute ends
+        :param time_weight: Time of day during the simulation
+        :return: Float value which gives the new commute time between source to destination node
+
+        >>> city =  City(2, 2, [100, 400, 800, 1400], [0.4, 0.2, 0.2, 0.1, 0.1])
+        >>> City.default_commute_time < city.get_commute_time((3,4), (3,5), 2) <=  City.default_commute_time * (1 + 2)
+        True
+        >>> time = city.get_commute_time((3,4), (2,1), 3) # doctest: +ELLIPSIS
+        Commute time cannot be changed as there is no direct path between source and destination...
+        >>> time == City.default_commute_time
+        True
+        >>> time = city.get_commute_time((6,6), (2,1), 3) # doctest: +ELLIPSIS
+        Traceback (most recent call last):
+        ...
+        Exception: Invalid Source or Destination Node.
         """
-        likely = 0.5 * (self.likely_vals[self.city_graph.nodes[source_node]['Zone_Number']] + self.likely_vals[self.city_graph.nodes[dest_node]['Zone_Number']])
-        traffic_time = mod_pert_random(low=0, likely=likely, high=1, samples=1)
-        traffic_time *= time_weight
-        commute_time = City.default_commute_time + City.default_commute_time * traffic_time
-        return commute_time
+        if self.city_graph.has_edge(source_node, dest_node):
+            likely = 0.5 * (self.likely_vals[self.city_graph.nodes[source_node]['Zone_Number']] + self.likely_vals[self.city_graph.nodes[dest_node]['Zone_Number']])
+            traffic_time = mod_pert_random(low=0, likely=likely, high=1, samples=1)
+            traffic_time *= time_weight
+            commute_time = City.default_commute_time + City.default_commute_time * traffic_time
+            return float(commute_time)
+        elif self.city_graph.has_node(source_node) & self.city_graph.has_node(dest_node):
+            print(f"Commute time cannot be changed as there is no direct path between source and "
+                  f"destination. Returning default time: {City.default_commute_time}")
+            return float(City.default_commute_time)
+        else:
+            raise Exception("Invalid Source or Destination Node.")
 
     def build_city_graph(self):
-        # Modeling each zone using 9 nodes as a 3 x 3 set of nodes
+        """
+        Builds a graph with an n*n grid of coordinates representing every zone, with n being the
+        class variable zone_dimension. A node is a tuple of coordinates governed by the specified
+        height, width and zone_dimension. Total nodes in a row is given by width of the object * n,
+        and total nodes in a column is given by height of the object * n. There is an edge between
+        every vertically and horizontally adjacent node, and no diagonal edges. The time taken to
+        go traverse between adjacent node has been set to the default value specified as class variable.
+        :return: None. Modifies graph object in place
 
-        ## Adding Nodes
+        >>> city =  City(2, 1, [400, 800], [0.4, 0.2, 0.2, 0.1, 0.1])
+        >>> city.build_city_graph()
+        >>> truth = True
+        >>> for (r, c) in list(city.city_graph.nodes):
+        ...     val = city.check_coordinates(r, c)
+        ...     truth *= val
+        >>> truth
+        1
+        >>> ((0, 0), (1, 1)) in list(city.city_graph.edges)
+        False
+        >>> ((1, 2), (1, 3)) in list(city.city_graph.edges)
+        True
+        >>> ((1, 2), (1, 4)) in list(city.city_graph.edges)
+        False
+        >>> zone_dict = {}
+        >>> for (r, c) in list(city.city_graph.nodes):
+        ...     zone = city.city_graph.nodes[(r, c)]['Zone_Number']
+        ...     if zone in zone_dict:
+        ...         zone_dict[zone] += 1
+        ...     else:
+        ...         zone_dict[zone] = 1
+        >>> set(zone_dict.values()) == {City.zone_dimension**2}
+        True
+        """
+
+        # Adding Nodes
         zone_num = -1
         for i in range(City.zone_dimension * self.height):
             for j in range(City.zone_dimension * self.width):
                 if (j == 0) or (j % City.zone_dimension == 0):
                     zone_num += 1
-                # print(zone_num)
                 self.city_graph.add_nodes_from([((i, j), {'Zone_Number': zone_num,
                                                           'Zone_Population': self.zone_populations[zone_num],
                                                           'Coord_Population': self.zone_populations[
@@ -97,7 +150,7 @@ class City:
             if (i == 0) or (i % City.zone_dimension != 0):
                 zone_num -= self.width
 
-        ## Adding Edges
+        # Adding Edges
         nodes = list(self.city_graph.nodes)
         for (i, j) in nodes:
             if self.city_graph.has_node((i, j + 1)):
@@ -120,7 +173,7 @@ class City:
                 self.city_graph[(i, j)][(i + 1, j)]['adjusted_time'] = commute_time
 
     def check_coordinates(self, x, y):
-        if x < self.width*3 and y < self.height*3:
+        if y < self.width*City.zone_dimension and x < self.height*City.zone_dimension:
             return True
         else:
             return False
