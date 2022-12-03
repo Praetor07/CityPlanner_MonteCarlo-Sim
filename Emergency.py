@@ -1,17 +1,19 @@
 import random
 import math
+import threading
 import networkx as nx
 from CityConfiguration import City
 from collections import defaultdict
 from EmergencyUnit import EmergencyUnit
 
 class Emergency:
+    lock = threading.Lock()
     # Class variable - Dictionary mapping different intensities to number of emergency teams and total time taken to
     # resolve once team reaches location of emergency
     intensity_mapping = {1: {'teams': 1, 'time': 5}, 2: {'teams': 4, 'time': 10}, 3: {'teams': 5, 'time': 15},
                          4: {'teams': 6, 'time': 20}, 5: {'teams': 7, 'time': 25}}
     # Class variable - Threshold of time for emergency resolution for it to be considered successfully resolved.
-    resolution_time_threshold = 25
+    resolution_time_threshold = 10
     # Class variable - List containing time taken for resolution of each emergency
     emergencies = []
     def __init__(self, city: City, zone: int):
@@ -81,7 +83,7 @@ class Emergency:
         Update current location to unit to location of emergency and store time after which unit becomes available.
         :return:
         """
-        if True:
+        with Emergency.lock:
             graph = self.city_of_emergency.city_graph
             emergency_requirement = self.requirement
             node_to_emergency_details = defaultdict(dict)

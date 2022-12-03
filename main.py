@@ -6,6 +6,7 @@ from EmergencyUnit import EmergencyUnit
 from threading import Thread
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 def poisson_probability(rates: np.array) -> np.array:
     return rates * np.exp(-1*rates)
@@ -28,8 +29,8 @@ def configure_city():
         print("Now, configure the population of each zone column-wise, assuming that the population is uniformly\n"
               "distributed within each zone.")
         populations = np.empty(width*height)
-        for zone in range(width*height):
-            populations[zone] = int(input("Enter the population of zone {}: ".format(zone)))
+        for z in range(width*height):
+            populations[z] = int(input("Enter the population of zone {}: ".format(z)))
         print("Now, configure the probability of each intensity type of, given that an emergency has occurred -\n"
               "with intensities measured on a scale of 1 to 5 where 1 is the lowest and 5 is the highest\n"
               "For example, if every intensity type is equally likely, then the probabilities for each intensity\n"
@@ -64,10 +65,10 @@ def configure_city():
             else:
                 limit = large_count
                 building_type = 'large'
-            for i in range(1, limit+1):
+            for unit in range(1, limit+1):
                 while True:
-                    x = int(input("Enter the x-coordinate of {} building {}: ".format(building_type, i)))
-                    y = int(input("Enter the y-coordinate of {} building {}: ".format(building_type, i)))
+                    x = int(input("Enter the x-coordinate of {} building {}: ".format(building_type, unit)))
+                    y = int(input("Enter the y-coordinate of {} building {}: ".format(building_type, unit)))
                     if not city_configured.check_coordinates(x, y):
                         print("Please enter valid coordinates according to the city configured.")
                     else:
@@ -77,7 +78,8 @@ def configure_city():
     except ValueError:
         print("Please enter only numeric values.")
 
-if __name__ == '__main__':
+
+def simulate(city):
     thread_list = []
     # populations = [2400, 3500, 900, 4500]
     # intensity_distributions = [0.2, 0.2, 0.2, 0.2, 0.2]
@@ -89,7 +91,7 @@ if __name__ == '__main__':
     # e2 = EmergencyUnit(3, (1, 4))
     # e3 = EmergencyUnit(3, (4, 1))
     # e4 = EmergencyUnit(3, (4, 4))
-    test = configure_city()
+    test = city
     seconds_in_a_day = 86400
     base_rate_for_emergency = 0.219
     base_population = 200000
@@ -98,7 +100,9 @@ if __name__ == '__main__':
     # print(zone_probabilities)
     # exit()
     aggregate_resp_times = []
-    for run in range(1, 101):
+    aggregate_perc_successful = []
+    # Obtained code for displaying progress bar in for loop from: https://stackoverflow.com/questions/3160699/python-progress-bar
+    for run in tqdm(range(1, 101)):
         for i in range(seconds_in_a_day):
             if i in [21599, 43119, 64799]:
                 test.update_graph_edges(math.floor((i+1)/21600))
@@ -113,18 +117,23 @@ if __name__ == '__main__':
             th.join()
         thread_list = []
         resp_times = list()
+        successful_response_emergencies = 0
         for emergency in Emergency.emergencies:
+            if emergency.time_to_respond > Emergency.resolution_time_threshold:
+                successful_response_emergencies += 1
             resp_times.append(emergency.time_to_respond)
-        print("{}".format(run))
-        avg = np.mean(np.asarray(resp_times))
+        # print("{}".format(run))
+        avg_resp_time = np.mean(np.asarray(resp_times))
+        perc_successful = successful_response_emergencies/len(resp_times)
         if run == 1:
-            aggregate_resp_times.append(avg)
+            aggregate_resp_times.append(avg_resp_time)
+            aggregate_perc_successful.append(perc_successful)
         else:
-            sum_until_now = aggregate_resp_times[-1] * len(aggregate_resp_times)
-            avg = (sum_until_now+avg)/run
-            aggregate_resp_times.append(avg)
+            resp_time_sum_until_now = aggregate_resp_times[-1] * len(aggregate_resp_times)
+            avg_resp_time = (resp_time_sum_until_now + avg_resp_time)/run
+            aggregate_resp_times.append(avg_resp_time)
+            perc_sum_until_now = aggregate_perc_successful[-1] * len(aggregate_perc_successful)
+            avg_perc_successful = (perc_sum_until_now + perc_successful)/run
+            aggregate_perc_successful.append(avg_perc_successful)
         Emergency.clear_emergencies()
-    df = pd.DataFrame({'Average Response Time': aggregate_resp_times})
-    df.plot()
-    for avg in aggregate_resp_times:
-        print(avg)
+    return aggregate_resp_times, aggregate_perc_successful
