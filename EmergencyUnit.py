@@ -18,16 +18,44 @@ class EmergencyUnit:
         EmergencyUnit.response_buildings.append(self)
 
     def relieve_response_teams(self, relieved_units):
+        """
+        Function to relive response teams once a emergency is resolved
+
+        :param relieved_units: number of units to be relived
+        :return: None
+
+        >>> e= EmergencyUnit('medium', (1,1))
+        >>> e.relieve_response_teams(1)
+        >>> e.available_capacity
+        3
+        """
         self.available_capacity += relieved_units
 
     def dispatch_teams(self, required_units):
+        """
+        Function to reduce units capacity after dispatching teams for emergency
+
+        :param required_units: number of units required by emergency
+        :return: None
+
+        >>> e= EmergencyUnit('medium', (1,1))
+        >>> e.dispatch_teams(1)
+        >>> e.available_capacity
+        1
+        """
         self.available_capacity -= required_units
 
     def check_team_availability(self, team_requirement: int):
         """
 
         :param team_requirement: attribute of the Emergency class determining the personnel needed to address the emergency
-        :return:
+        :return: further requirement, <if building can source all teams>, dispatched teams from unit
+
+        >>> e= EmergencyUnit('medium', (1,1))
+        >>> e.check_team_availability(2)
+        (0, True, 2)
+        >>> e.check_team_availability(3)
+        (1, True, 2)
         """
         if self.available_capacity <= 0:
             return team_requirement, False, 0

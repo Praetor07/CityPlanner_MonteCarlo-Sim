@@ -109,7 +109,8 @@ class Emergency:
                     winner_nodes[response_unit] = teams_dispatched
                 if emergency_requirement == 0:
                     break
-            avg_resp = response_time / number_of_units
+            avg_resp = response_time
+            print(avg_resp)
             # winner_criteria = 1 if avg_resp >= 15 else 0
             return winner_nodes, avg_resp
 

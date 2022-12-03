@@ -97,8 +97,6 @@ def simulate(city):
     base_population = 200000
     base_rate_per_person = base_rate_for_emergency/base_population
     zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(test.zone_populations))
-    # print(zone_probabilities)
-    # exit()
     aggregate_resp_times = []
     aggregate_perc_successful = []
     # Obtained code for displaying progress bar in for loop from: https://stackoverflow.com/questions/3160699/python-progress-bar
