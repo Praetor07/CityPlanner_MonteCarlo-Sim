@@ -15,7 +15,10 @@ class EmergencyUnit:
         """
         self.location = location
         self.available_capacity = EmergencyUnit.type_to_capacity_mapping[size]
-        EmergencyUnit.response_buildings.append(self)
+        if self.check_emergency_building_coordinates():
+            EmergencyUnit.response_buildings.append(self)
+        else:
+            raise ValueError("Coordinates are duplicate for EmergencyResponse unit buildings..")
 
     def relieve_response_teams(self, relieved_units):
         """
@@ -63,6 +66,15 @@ class EmergencyUnit:
             return team_requirement - self.available_capacity, True, self.available_capacity
         else:
             return 0, True, team_requirement
+
+    def check_emergency_building_coordinates(self):
+        flag = True
+        for unit in EmergencyUnit.response_buildings:
+            if unit.location == self.location:
+                flag = False
+                break
+        return flag
+
 
 
 

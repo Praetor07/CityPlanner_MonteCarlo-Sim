@@ -77,7 +77,7 @@ def configure_city_file():
                         EmergencyUnit("large", (int(coordinate[0]), int(coordinate[1])))
                     counter += 1
             present_line = f.readline()
-
+    return city_configured
 
 def configure_city():
     try:
@@ -202,3 +202,7 @@ def simulate(city):
             aggregate_perc_successful.append(avg_perc_successful)
         Emergency.clear_emergencies()
     return aggregate_resp_times, aggregate_perc_successful
+
+if __name__ == '__main__':
+    city = configure_city_file()
+    simulate(city)
