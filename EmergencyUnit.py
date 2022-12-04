@@ -6,7 +6,8 @@ from CityConfiguration import City
 class EmergencyUnit:
     # Class variable - List of all emergency units (all objects of class)
     response_buildings = []
-    type_to_capacity_mapping = {'small': 1, 'medium': 2, 'large': 3}
+    wait_for_teams_to_be_available = False
+    type_to_capacity_mapping = {'small': 1, 'medium': 3, 'large': 5}
     def __init__(self, size: str, location: tuple):
         """
         Initialize size and location of the emergency unit, along with number of teams currently available
@@ -18,6 +19,7 @@ class EmergencyUnit:
         EmergencyUnit.response_buildings.append(self)
 
     def relieve_response_teams(self, relieved_units):
+        EmergencyUnit.wait_for_teams_to_be_available = False
         self.available_capacity += relieved_units
 
     def dispatch_teams(self, required_units):
@@ -37,5 +39,9 @@ class EmergencyUnit:
             return 0, True, team_requirement
 
 
+    @staticmethod
+    def clear_emergency_buildings():
+        EmergencyUnit.wait_for_teams_to_be_available = False
+        EmergencyUnit.response_buildings = []
 
 

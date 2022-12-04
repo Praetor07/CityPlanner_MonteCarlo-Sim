@@ -14,6 +14,8 @@ def poisson_probability(rates: np.array) -> np.array:
 
 def configure_city():
     try:
+        EmergencyUnit.clear_emergency_buildings()
+        Emergency.clear_emergencies()
         print("Welcome to the Emergency Response Monte-Carlo Simulation. You will have to configure the city\n"
               "in terms of its dimensions, populations, probability of each intensity type occurring in the 5-point emergency\n"
               "intensity scale (depending on the nature of the city you are designing), and the locations of the emergency\n"
@@ -106,7 +108,7 @@ def simulate(city):
         for i in range(seconds_in_a_day):
             if i in [21599, 43119, 64799]:
                 test.update_graph_edges(math.floor((i+1)/21600))
-            for zone in range(zone_probabilities.shape[0]):
+            for zone in range(len(zone_probabilities)):
                 prob = zone_probabilities[zone]*1000000
                 if random.randint(1, 1000000) <= prob:
                     e = Emergency(test, zone)
@@ -124,7 +126,7 @@ def simulate(city):
             resp_times.append(emergency.time_to_respond)
         # print("{}".format(run))
         avg_resp_time = np.mean(np.asarray(resp_times))
-        perc_successful = successful_response_emergencies/len(resp_times)
+        perc_successful = (successful_response_emergencies/len(resp_times))*100
         if run == 1:
             aggregate_resp_times.append(avg_resp_time)
             aggregate_perc_successful.append(perc_successful)
@@ -136,4 +138,5 @@ def simulate(city):
             avg_perc_successful = (perc_sum_until_now + perc_successful)/run
             aggregate_perc_successful.append(avg_perc_successful)
         Emergency.clear_emergencies()
+    EmergencyUnit.clear_emergency_buildings()
     return aggregate_resp_times, aggregate_perc_successful
