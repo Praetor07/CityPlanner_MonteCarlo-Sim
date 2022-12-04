@@ -27,7 +27,7 @@ class EmergencyUnit:
         :param relieved_units: number of units to be relived
         :return: None
 
-        >>> e= EmergencyUnit('medium', (1,1))
+        >>> e= EmergencyUnit('medium', (1,3))
         >>> e.relieve_response_teams(1)
         >>> e.available_capacity
         3
@@ -41,7 +41,7 @@ class EmergencyUnit:
         :param required_units: number of units required by emergency
         :return: None
 
-        >>> e= EmergencyUnit('medium', (1,1))
+        >>> e= EmergencyUnit('medium', (1,2))
         >>> e.dispatch_teams(1)
         >>> e.available_capacity
         1
@@ -68,6 +68,16 @@ class EmergencyUnit:
             return 0, True, team_requirement
 
     def check_emergency_building_coordinates(self):
+        """
+        Function to ensure no duplicate unit building coordinates are passed
+        :return: flag, True if no other unit in same coordinate
+
+        >>> e= EmergencyUnit('medium', (2,2))
+        >>> e1= EmergencyUnit('medium', (2,2)) # doctest: +ELLIPSIS
+        Traceback (most recent call last):
+        ...
+        ValueError: Coordinates are duplicate for EmergencyResponse unit buildings..
+        """
         flag = True
         for unit in EmergencyUnit.response_buildings:
             if unit.location == self.location:
