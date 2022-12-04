@@ -93,9 +93,9 @@ class Emergency:
         >>> e.time_to_respond > 1
         True
         """
-        emergency_units, time_taken_to_reach = self.allocate_teams_to_emergency()
-        time_to_resolve = time_taken_to_reach + Emergency.intensity_mapping[self.intensity]['time'] + time_taken_to_reach
-        self.time_to_respond = float(time_taken_to_reach)
+        emergency_units, time_taken_to_reach, waiting_time = self.allocate_teams_to_emergency()
+        time_to_resolve = time_taken_to_reach + Emergency.intensity_mapping[self.intensity]['time'] + time_taken_to_reach + (waiting_time//60)
+        self.time_to_respond = float(time_taken_to_reach) + waiting_time/60
         for _ in range(int(time_to_resolve)*60):
             pass
         for emergency_unit, num_teams in emergency_units.items():
@@ -140,11 +140,11 @@ class Emergency:
         >>> 0 <= list(unit_loc.keys())[0].location[1] <= 5
         True
         """
+        waiting_time = 0
         with Emergency.lock:
             graph = self.city_of_emergency.city_graph
             emergency_requirement = self.requirement
             response_time = 0  # seconds
-            number_of_units = 0
             winner_nodes = defaultdict(dict)
             while emergency_requirement != 0:
                 node_to_emergency_details = defaultdict(dict)
@@ -162,19 +162,19 @@ class Emergency:
                         emergency_requirement)
                     if available:
                         response_time += sorted_node_to_emergency_details[response_unit]['time']
-                        number_of_units += 1
                         response_unit.dispatch_teams(teams_dispatched)
                         winner_nodes[response_unit] = teams_dispatched
                     if emergency_requirement == 0:
                         break
-                if number_of_units == 0 and emergency_requirement != 0:
+                if emergency_requirement != 0:
                     EmergencyUnit.wait_for_teams_to_be_available = True
                     while EmergencyUnit.wait_for_teams_to_be_available:
+                        waiting_time += 1
                         pass
                 else:
-                    avg_resp = response_time / number_of_units
+                    avg_resp = response_time / len(winner_nodes)
             # winner_criteria = 1 if avg_resp >= 15 else 0
-            return winner_nodes, avg_resp
+            return winner_nodes, avg_resp, waiting_time
 
     @staticmethod
     def clear_emergencies():
