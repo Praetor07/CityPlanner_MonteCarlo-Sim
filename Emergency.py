@@ -109,8 +109,13 @@ class Emergency:
                     winner_nodes[response_unit] = teams_dispatched
                 if emergency_requirement == 0:
                     break
+            if emergency_requirement != 0:
+                print("Unable to meet emergency requirement, waiting..")
+                #Need to cater to this condition
+                #Assign the exiting buffer to self.requirement and wait for the trigger showing that a unit is free.
+                #Add response time and winner nodes as attributes for the emergency object. Allows for memory
             avg_resp = response_time
-            print(avg_resp)
+            #print(avg_resp, self.location, self.requirement)
             # winner_criteria = 1 if avg_resp >= 15 else 0
             return winner_nodes, avg_resp
 
