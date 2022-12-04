@@ -7,7 +7,6 @@ from CityConfiguration import City
 from EmergencyUnit import EmergencyUnit
 from threading import Thread
 import numpy as np
-import pandas as pd
 from tqdm import tqdm
 
 def poisson_probability(rates: np.array) -> np.array:
@@ -25,70 +24,81 @@ def poisson_probability(rates: np.array) -> np.array:
         raise ValueError("Rates cannot be converted to poisson probabilities ")
 
 def configure_city_file():
+    """
+    Function to read the configuration file and construct the city
+    :return:
+    """
     city_init = 0
-    with open('./config/configuration.txt', 'r') as f:
-        present_line = f.readline()
-        while present_line:
-            if re.search('dimension', present_line,re.IGNORECASE):
-                counter = 0
-                city_init += 1
-                while counter < 2:
-                    temp_string = f.readline()
-                    if re.search('height', temp_string, re.IGNORECASE):
-                        height = int(temp_string.split(' ')[-1])
-                        if height <= 0:
-                            raise ValueError
-                    if re.search('width', temp_string, re.IGNORECASE):
-                        width = int(temp_string.split(' ')[-1])
-                        if width <= 0:
-                            raise ValueError
-                    counter += 1
-            if re.search('population', present_line, re.IGNORECASE):
-                city_init += 1
-                populations_list = np.empty(width * height)
-                counter = 0
-                while counter < height*width:
-                    population = int(f.readline().split()[0])
-                    populations_list[counter] = population
-                    counter += 1
-            if re.search('intensity', present_line, re.IGNORECASE):
-                city_init += 1
-                intensity = f.readline()
-                intensity_distributions = [float(i) for i in intensity.split(' ')]
-            if city_init == 3:
-                city_configured = City(width, height, populations_list, intensity_distributions)
-            if re.search('small building', present_line, re.IGNORECASE):
-                count_of_small_buildings = int(f.readline().split()[0])
-                counter = 0
-                while counter < count_of_small_buildings:
-                    coordinate = f.readline().split(',')
-                    if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
-                        print("Please enter valid coordinates according to the city configured.")
-                    else:
-                        EmergencyUnit("small", (int(coordinate[0]), int(coordinate[1])))
-                    counter += 1
-            if re.search('medium building', present_line, re.IGNORECASE):
-                count_of_medium_buildings = int(f.readline().split()[0])
-                counter = 0
-                while counter < count_of_medium_buildings:
-                    coordinate = f.readline().split(',')
-                    if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
-                        print("Please enter valid coordinates according to the city configured.")
-                    else:
-                        EmergencyUnit("medium", (int(coordinate[0]), int(coordinate[1])))
-                    counter += 1
-            if re.search('large building', present_line, re.IGNORECASE):
-                count_of_large_buildings = int(f.readline().split()[0])
-                counter = 0
-                while counter < count_of_large_buildings:
-                    coordinate = f.readline().split(',')
-                    if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
-                        print("Please enter valid coordinates according to the city configured.")
-                    else:
-                        EmergencyUnit("large", (int(coordinate[0]), int(coordinate[1])))
-                    counter += 1
-            present_line = f.readline()
-    return city_configured
+    try:
+        with open('./config/configuration.txt', 'r') as f:
+                present_line = f.readline()
+                while present_line:
+                    if re.search('dimension', present_line,re.IGNORECASE):
+                        counter = 0
+                        city_init += 1
+                        while counter < 2:
+                            temp_string = f.readline()
+                            if re.search('height', temp_string, re.IGNORECASE):
+                                height = int(temp_string.split(' ')[-1])
+                                if height <= 0:
+                                    raise ValueError
+                            if re.search('width', temp_string, re.IGNORECASE):
+                                width = int(temp_string.split(' ')[-1])
+                                if width <= 0:
+                                    raise ValueError
+                            counter += 1
+                    if re.search('population', present_line, re.IGNORECASE):
+                        city_init += 1
+                        populations_list = np.empty(width * height)
+                        counter = 0
+                        while counter < height*width:
+                            population = int(f.readline().split()[0])
+                            if population <= 0:
+                                raise Exception("Population should be greater than 0")
+                            populations_list[counter] = population
+                            counter += 1
+                    if re.search('intensity', present_line, re.IGNORECASE):
+                        city_init += 1
+                        intensity = f.readline()
+                        intensity_distributions = np.asarray([float(i) for i in intensity.split(' ')])
+                        if intensity_distributions.sum() != 1:
+                            raise Exception("Intensity distributions should sum to 1")
+                    if city_init == 3:
+                        city_configured = City(width, height, populations_list, intensity_distributions)
+                    if re.search('small building', present_line, re.IGNORECASE):
+                        count_of_small_buildings = int(f.readline().split()[0])
+                        counter = 0
+                        while counter < count_of_small_buildings:
+                            coordinate = f.readline().strip().split(',')
+                            if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
+                                print("Please enter valid coordinates according to the city configured.")
+                            else:
+                                EmergencyUnit("small", (int(coordinate[0]), int(coordinate[1])))
+                            counter += 1
+                    if re.search('medium building', present_line, re.IGNORECASE):
+                        count_of_medium_buildings = int(f.readline().strip().split()[0])
+                        counter = 0
+                        while counter < count_of_medium_buildings:
+                            coordinate = f.readline().split(',')
+                            if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
+                                print("Please enter valid coordinates according to the city configured.")
+                            else:
+                                EmergencyUnit("medium", (int(coordinate[0]), int(coordinate[1])))
+                            counter += 1
+                    if re.search('large building', present_line, re.IGNORECASE):
+                        count_of_large_buildings = int(f.readline().strip().split()[0])
+                        counter = 0
+                        while counter < count_of_large_buildings:
+                            coordinate = f.readline().split(',')
+                            if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
+                                print("Please enter valid coordinates according to the city configured.")
+                            else:
+                                EmergencyUnit("large", (int(coordinate[0]), int(coordinate[1])))
+                            counter += 1
+                    present_line = f.readline()
+                return city_configured
+    except ValueError:
+        print("\n###Please only enter numeric values in the configuration file###")
 
 def configure_city():
     try:
@@ -200,7 +210,7 @@ def simulate(city):
             if emergency.time_to_respond <= Emergency.resolution_time_threshold:
                 successful_response_emergencies += 1
             resp_times.append(emergency.time_to_respond)
-        # print("{}".format(run))
+        # print("{}
         avg_resp_time = np.mean(np.asarray(resp_times))
         perc_successful = (successful_response_emergencies/len(resp_times))*100
         if run == 1:
@@ -217,6 +227,7 @@ def simulate(city):
     EmergencyUnit.clear_emergency_buildings()
     return aggregate_resp_times, aggregate_perc_successful
 
-# if __name__ == '__main__':
-#     city = configure_city_file()
-#     simulate(city)
+
+if __name__ == '__main__':
+     city = configure_city_file()
+     #simulate(city)
