@@ -167,10 +167,10 @@ class Emergency:
                         winner_nodes[response_unit] = teams_dispatched
                     if emergency_requirement == 0:
                         break
-                # if number_of_units == 0:
-                #     EmergencyUnit.wait_for_teams_to_be_available = True
-                #     while EmergencyUnit.wait_for_teams_to_be_available:
-                #         pass
+                if number_of_units == 0:
+                    EmergencyUnit.wait_for_teams_to_be_available = True
+                    while EmergencyUnit.wait_for_teams_to_be_available:
+                        pass
                 if number_of_units != 0 and emergency_requirement == 0:
                     avg_resp = response_time / number_of_units
             # winner_criteria = 1 if avg_resp >= 15 else 0
