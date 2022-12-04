@@ -1,7 +1,6 @@
 import random
 import math
 import threading
-from time import sleep
 import networkx as nx
 from CityConfiguration import City
 from collections import defaultdict
@@ -18,7 +17,6 @@ class Emergency:
     resolution_time_threshold = 10
     # Class variable - List containing time taken for resolution of each emergency
     emergencies = []
-    looping_time = None
 
     def __init__(self, city: City, zone: int):
         """
@@ -64,6 +62,7 @@ class Emergency:
         self.city_of_emergency = city
         self.requirement = Emergency.intensity_mapping[self.intensity]['teams']
         Emergency.emergencies.append(self)
+        self.resolve_emergency()
 
 
     def resolve_emergency(self):
@@ -101,9 +100,9 @@ class Emergency:
         emergency_units, time_taken_to_reach, waiting_time = self.allocate_teams_to_emergency()
         time_to_resolve = time_taken_to_reach + Emergency.intensity_mapping[self.intensity]['time'] + time_taken_to_reach + (waiting_time//60)
         self.time_to_respond = float(time_taken_to_reach) + waiting_time/60
-        for _ in range(int(time_to_resolve)*60):
-            if Emergency.looping_time:
-                sleep(Emergency.looping_time)
+        for _ in range(int(time_to_resolve*60)):
+            for __ in self.city_of_emergency.zone_populations:
+                random.randint(1, 1000000)
         for emergency_unit, num_teams in emergency_units.items():
             emergency_unit.relieve_response_teams(num_teams)
 
@@ -180,8 +179,8 @@ class Emergency:
                 if emergency_requirement != 0:
                     EmergencyUnit.wait_for_teams_to_be_available = True
                     while EmergencyUnit.wait_for_teams_to_be_available:
-                        if Emergency.looping_time:
-                            sleep(Emergency.looping_time)
+                        for __ in self.city_of_emergency.zone_populations:
+                            random.randint(1, 1000000)
                         waiting_time += 1
                 else:
                     avg_resp = response_time / len(winner_nodes)
