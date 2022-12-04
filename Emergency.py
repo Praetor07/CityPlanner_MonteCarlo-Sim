@@ -70,6 +70,8 @@ class Emergency:
         >>> populations = [2500, 2500]
         >>> intensity_distributions = [1, 0, 0, 0, 0]
         >>> test = City(2, 1, populations, intensity_distributions)
+        >>> EmergencyUnit.clear_emergency_buildings()
+        >>> Emergency.clear_emergencies()
         >>> e1 = EmergencyUnit('small', (1, 1))
         >>> e2 = EmergencyUnit('small', (1, 2))
         >>> e3 = EmergencyUnit('small', (1, 3))
@@ -111,6 +113,8 @@ class Emergency:
         >>> populations = [2500, 2500]
         >>> intensity_distributions = [0, 1, 0, 0, 0]
         >>> test = City(2, 1, populations, intensity_distributions)
+        >>> EmergencyUnit.clear_emergency_buildings()
+        >>> Emergency.clear_emergencies()
         >>> e1 = EmergencyUnit('small', (1, 1))
         >>> e2 = EmergencyUnit('small', (1, 2))
         >>> e3 = EmergencyUnit('small', (1, 3))
@@ -140,6 +144,9 @@ class Emergency:
         >>> 0 <= list(unit_loc.keys())[0].location[1] <= 5
         True
         """
+        # Locking mechanism used for the thread to acquire a lock at the beginning of the method and release it at the
+        # end to prevent race conditions
+        # Locking code obtained from https://coderslegacy.com/python/lock-in-with-statement/
         with Emergency.lock:
             graph = self.city_of_emergency.city_graph
             emergency_requirement = self.requirement

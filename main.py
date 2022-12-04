@@ -11,7 +11,18 @@ import pandas as pd
 from tqdm import tqdm
 
 def poisson_probability(rates: np.array) -> np.array:
-    return rates * np.exp(-1*rates)
+    """
+
+    :param rates:
+    :return:
+    >>> res = poisson_probability(np.asarray([0.0256, 0.349, 0.00127]))
+    >>> [round(prob, 5) for prob in res]
+    [0.02495, 0.24618, 0.00127]
+    """
+    if rates.dtype == np.float64:
+        return rates * np.exp(-1*rates)
+    else:
+        raise ValueError("Rates cannot be converted to poisson probabilities ")
 
 def configure_city_file():
     city_init = 0
