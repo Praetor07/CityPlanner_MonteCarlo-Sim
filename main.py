@@ -25,8 +25,12 @@ def configure_city_file():
                     temp_string = f.readline()
                     if re.search('height', temp_string, re.IGNORECASE):
                         height = int(temp_string.split(' ')[-1])
+                        if height <= 0:
+                            raise ValueError
                     if re.search('width', temp_string, re.IGNORECASE):
                         width = int(temp_string.split(' ')[-1])
+                        if width <= 0:
+                            raise ValueError
                     counter += 1
             if re.search('population', present_line, re.IGNORECASE):
                 city_init += 1
@@ -73,14 +77,6 @@ def configure_city_file():
                         EmergencyUnit("large", (int(coordinate[0]), int(coordinate[1])))
                     counter += 1
             present_line = f.readline()
-            print(present_line)
-        print(height, width, populations_list, intensity_distributions)
-
-configure_city_file()
-exit()
-
-
-
 
 
 def configure_city():
