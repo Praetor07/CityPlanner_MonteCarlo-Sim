@@ -181,18 +181,18 @@ def simulate(city):
     # e3 = EmergencyUnit(3, (4, 1))
     # e4 = EmergencyUnit(3, (4, 4))
     test = city
-    seconds_in_a_day = 86400
-    base_rate_for_emergency = 0.219
+    seconds_in_a_day = 1440
+    base_rate_for_emergency = 13.615119
     base_population = 200000
     base_rate_per_person = base_rate_for_emergency/base_population
     zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(test.zone_populations))
     aggregate_resp_times = []
     aggregate_perc_successful = []
     # Obtained code for displaying progress bar in for loop from: https://stackoverflow.com/questions/3160699/python-progress-bar
-    for run in tqdm(range(1, 51)):
+    for run in tqdm(range(1, 101)):
         for i in range(seconds_in_a_day):
-            if i in [21599, 43119, 64799]:
-                test.update_graph_edges(math.floor((i+1)/21600))
+            if i in [359, 719, 1079]:
+                test.update_graph_edges(math.floor((i+1)/360))
             for zone in range(len(zone_probabilities)):
                 prob = zone_probabilities[zone]*1000000
                 if random.randint(1, 1000000) <= prob:

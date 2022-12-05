@@ -98,9 +98,9 @@ class Emergency:
         True
         """
         emergency_units, time_taken_to_reach, waiting_time = self.allocate_teams_to_emergency()
-        time_to_resolve = time_taken_to_reach + Emergency.intensity_mapping[self.intensity]['time'] + time_taken_to_reach + (waiting_time//60)
-        self.time_to_respond = float(time_taken_to_reach) + waiting_time/60
-        for _ in range(int(time_to_resolve*60)):
+        time_to_resolve = time_taken_to_reach + Emergency.intensity_mapping[self.intensity]['time'] + time_taken_to_reach + (waiting_time)
+        self.time_to_respond = float(time_taken_to_reach) + waiting_time
+        for _ in range(int(time_to_resolve)):
             for __ in self.city_of_emergency.zone_populations:
                 random.randint(1, 1000000)
         for emergency_unit, num_teams in emergency_units.items():
