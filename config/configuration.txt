@@ -12,11 +12,13 @@ Width 2
 1
 1,1
 ###Medium buildings(3 teams)###
-4
+6
 4,5
 5,2
 0,0
 2,1
+2,3
+3,4
 ###Large buildings(5 teams)###
 0
 

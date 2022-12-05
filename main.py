@@ -1,7 +1,6 @@
 import math
 import random
 import re
-
 from Emergency import Emergency
 from CityConfiguration import City
 from EmergencyUnit import EmergencyUnit
@@ -190,15 +189,14 @@ def simulate(city):
     aggregate_resp_times = []
     aggregate_perc_successful = []
     # Obtained code for displaying progress bar in for loop from: https://stackoverflow.com/questions/3160699/python-progress-bar
-    for run in tqdm(range(1, 101)):
+    for run in tqdm(range(1, 51)):
         for i in range(seconds_in_a_day):
             if i in [21599, 43119, 64799]:
                 test.update_graph_edges(math.floor((i+1)/21600))
             for zone in range(len(zone_probabilities)):
                 prob = zone_probabilities[zone]*1000000
                 if random.randint(1, 1000000) <= prob:
-                    e = Emergency(test, zone)
-                    th = Thread(target=e.resolve_emergency(), daemon=False)
+                    th = Thread(target=Emergency, args=[city, zone], daemon=False)
                     th.start()
                     thread_list.append(th)
         for th in thread_list:

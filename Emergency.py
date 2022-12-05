@@ -6,6 +6,7 @@ from CityConfiguration import City
 from collections import defaultdict
 from EmergencyUnit import EmergencyUnit
 
+
 class Emergency:
     lock = threading.Lock()
     # Class variable - Dictionary mapping different intensities to number of emergency teams and total time taken to
@@ -61,6 +62,7 @@ class Emergency:
         self.city_of_emergency = city
         self.requirement = Emergency.intensity_mapping[self.intensity]['teams']
         Emergency.emergencies.append(self)
+        self.resolve_emergency()
 
 
     def resolve_emergency(self):
@@ -98,8 +100,9 @@ class Emergency:
         emergency_units, time_taken_to_reach, waiting_time = self.allocate_teams_to_emergency()
         time_to_resolve = time_taken_to_reach + Emergency.intensity_mapping[self.intensity]['time'] + time_taken_to_reach + (waiting_time//60)
         self.time_to_respond = float(time_taken_to_reach) + waiting_time/60
-        for _ in range(int(time_to_resolve)*60):
-            pass
+        for _ in range(int(time_to_resolve*60)):
+            for __ in self.city_of_emergency.zone_populations:
+                random.randint(1, 1000000)
         for emergency_unit, num_teams in emergency_units.items():
             emergency_unit.relieve_response_teams(num_teams)
 
@@ -176,8 +179,9 @@ class Emergency:
                 if emergency_requirement != 0:
                     EmergencyUnit.wait_for_teams_to_be_available = True
                     while EmergencyUnit.wait_for_teams_to_be_available:
+                        for __ in self.city_of_emergency.zone_populations:
+                            random.randint(1, 1000000)
                         waiting_time += 1
-                        pass
                 else:
                     avg_resp = response_time / len(winner_nodes)
             # winner_criteria = 1 if avg_resp >= 15 else 0

@@ -36,6 +36,7 @@ class City:
     default_commute_time = 3
     # Class variable - represents size of each zone in terms of coordinates
     # Class variable - represents constant time between two adjacent nodes with no traffic between them
+
     def __init__(self, width: int, height: int, zone_populations: list, intensity_distribution: list):
         """
         Initialize a networkx graph where each node is a coordinate in the city, with its properties being zone number,
@@ -134,6 +135,10 @@ class City:
         ...         zone_dict[zone] = 1
         >>> set(zone_dict.values()) == {City.zone_dimension**2}
         True
+        >>> city =  City(2, 1, [400], [0.4, 0.2, 0.2, 0.1, 0.1]) # doctest +ELLIPSIS
+        Exception raised:
+        ...
+        Exception: Specify zone population for all width x height number of zones
         """
 
         # Adding Nodes
@@ -156,6 +161,7 @@ class City:
                 self.city_graph.add_edge((i, j), (i, j + 1), adjusted_time=City.default_commute_time)
             if self.city_graph.has_node((i + 1, j)):
                 self.city_graph.add_edge((i, j), (i + 1, j), adjusted_time=City.default_commute_time)
+
 
     def update_graph_edges(self, time_of_day: int):
         """
