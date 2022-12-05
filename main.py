@@ -8,6 +8,9 @@ from threading import Thread
 import numpy as np
 from tqdm import tqdm
 
+class ValidationError(Exception):
+    pass
+
 def poisson_probability(rates: np.array) -> np.array:
     """
 
@@ -29,7 +32,7 @@ def configure_city_file(configuration_file: str):
     """
     city_init = 0
     try:
-        with open(configuration_file, 'r') as f:
+        with open(f"./config/{configuration_file}", 'r') as f:
                 present_line = f.readline()
                 while present_line:
                     if re.search('dimension', present_line,re.IGNORECASE):
@@ -40,11 +43,11 @@ def configure_city_file(configuration_file: str):
                             if re.search('height', temp_string, re.IGNORECASE):
                                 height = int(temp_string.split(' ')[-1])
                                 if height <= 0:
-                                    raise ValueError
+                                    raise ValidationError("Kindly check values again. Number is less than 0")
                             if re.search('width', temp_string, re.IGNORECASE):
                                 width = int(temp_string.split(' ')[-1])
                                 if width <= 0:
-                                    raise ValueError
+                                    raise ValidationError("Kindly check values again. Number is less than 0")
                             counter += 1
                     if re.search('population', present_line, re.IGNORECASE):
                         city_init += 1
@@ -98,75 +101,8 @@ def configure_city_file(configuration_file: str):
                 return city_configured
     except ValueError:
         print("\n###Please only enter numeric values in the configuration file###")
-
-def configure_city():
-    try:
-        EmergencyUnit.clear_emergency_buildings()
-        Emergency.clear_emergencies()
-        print("Welcome to the Emergency Response Monte-Carlo Simulation. You will have to configure the city\n"
-              "in terms of its dimensions, populations, probability of each intensity type occurring in the 5-point emergency\n"
-              "intensity scale (depending on the nature of the city you are designing), and the locations of the emergency\n"
-              "unit buildings within the city")
-        print("First, you will need to configure the city width and height in terms of the zone unit, where each zone\n"
-              "represents a 3X3 square consisting of 9 coordinates")
-        width = int(input("Enter the width of the city in terms of number of zones: "))
-        if width <= 0:
-            raise ValueError()
-        height = int(input("Enter the height of the city in terms of number of zones: "))
-        if height <= 0:
-            raise ValueError()
-        print("Now, configure the population of each zone column-wise, assuming that the population is uniformly\n"
-              "distributed within each zone.")
-        populations = np.empty(width*height)
-        for z in range(width*height):
-            populations[z] = int(input("Enter the population of zone {}: ".format(z)))
-        print("Now, configure the probability of each intensity type of, given that an emergency has occurred -\n"
-              "with intensities measured on a scale of 1 to 5 where 1 is the lowest and 5 is the highest\n"
-              "For example, if every intensity type is equally likely, then the probabilities for each intensity\n"
-              "type would be 0.2. Ensure that the provided probabilities add up to exactly 1.")
-        intensity_distributions = np.empty(5)
-        while True:
-            for intensity in range(1, 6):
-                intensity_distributions[intensity-1] = float(input("Enter the probability of the emergency being of intensity {}, given that an emergency has occurred: ".format(intensity)))
-            if np.sum(intensity_distributions) != 1.0:
-                print("Please ensure that the probabilities add up to exactly 1.")
-            else:
-                break
-        city_configured = City(width, height, populations, intensity_distributions)
-        print("Now, configure the types and locations of the emergency unit buildings within the city.\n"
-              "There are three types of emergency unit buildings - small buildings each housing 1 emergency response team,\n"
-              "medium buildings each housing 3 emergency response teams, and large buildings each housing 5 emergency response teams.")
-        while True:
-            small_count = int(input("Enter the number of small emergency unit buildings: "))
-            medium_count = int(input("Enter the number of medium emergency unit buildings: "))
-            large_count = int(input("Enter the number of large emergency unit buildings: "))
-            if small_count + medium_count + large_count == 0:
-                print("Please ensure that there is atleast one emergency unit building")
-            else:
-                break
-        for size in range(3):
-            if size == 0:
-                limit = small_count
-                building_type = 'small'
-            elif size == 1:
-                limit = medium_count
-                building_type = 'medium'
-            else:
-                limit = large_count
-                building_type = 'large'
-            for unit in range(1, limit+1):
-                while True:
-                    x = int(input("Enter the x-coordinate of {} building {}: ".format(building_type, unit)))
-                    y = int(input("Enter the y-coordinate of {} building {}: ".format(building_type, unit)))
-                    if not city_configured.check_coordinates(x, y):
-                        print("Please enter valid coordinates according to the city configured.")
-                    else:
-                        EmergencyUnit(building_type, (x, y))
-                        break
-        return city_configured
-    except ValueError:
-        print("Please enter only numeric values.")
-
+    except ValidationError as v:
+        print(v)
 
 def simulate(city):
     thread_list = []
@@ -184,6 +120,7 @@ def simulate(city):
     seconds_in_a_day = 1440
     base_rate_for_emergency = 13.615119
     base_population = 200000
+    number_of_emergencies = 0
     base_rate_per_person = base_rate_for_emergency/base_population
     zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(test.zone_populations))
     aggregate_resp_times = []
@@ -205,6 +142,7 @@ def simulate(city):
         resp_times = list()
         successful_response_emergencies = 0
         for emergency in Emergency.emergencies:
+            number_of_emergencies += 1
             if emergency.time_to_respond <= Emergency.resolution_time_threshold:
                 successful_response_emergencies += 1
             resp_times.append(emergency.time_to_respond)
@@ -223,9 +161,12 @@ def simulate(city):
             aggregate_perc_successful.append(avg_perc_successful)
         Emergency.clear_emergencies()
     EmergencyUnit.clear_emergency_buildings()
-    return aggregate_resp_times, aggregate_perc_successful
+    return aggregate_resp_times, aggregate_perc_successful, number_of_emergencies
 
 
 if __name__ == '__main__':
-     city = configure_city_file()
-     #simulate(city)
+     city = configure_city_file('hybrid_medium_ps.txt')
+     resp_times, perc_successfull, emergencies = simulate(city)
+     print(f"Total number of emergencies occured: {emergencies}")
+     print(f"Average response time: {resp_times[-1]}")
+     print(f"Success ratio : {perc_successfull[-1]}")
