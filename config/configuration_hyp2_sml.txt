@@ -1,0 +1,43 @@
+###Dimensions###
+Height 4
+Width 4
+####Population####Should enter height*width lines###
+4500
+6500
+3200
+1000
+3200
+4000
+2200
+1500
+5000
+2700
+3000
+2700
+2400
+1200
+2900
+3600
+###Intensity distribution###
+0.2 0.2 0.2 0.2 0.2
+###Small buildings(1 teams)###
+8
+0,0
+0,5
+0,11
+5,0
+5,11
+11,0
+11,5
+11,11
+###Medium buildings(3 teams)###
+5
+2,2
+2,9
+9,2
+9,9
+2,6
+###Large buildings(5 teams)###
+2
+6,3
+6,8
