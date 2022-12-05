@@ -22,14 +22,14 @@ def poisson_probability(rates: np.array) -> np.array:
     else:
         raise ValueError("Rates cannot be converted to poisson probabilities ")
 
-def configure_city_file():
+def configure_city_file(configuration_file: str):
     """
     Function to read the configuration file and construct the city
     :return:
     """
     city_init = 0
     try:
-        with open('./config/configuration.txt', 'r') as f:
+        with open(configuration_file, 'r') as f:
                 present_line = f.readline()
                 while present_line:
                     if re.search('dimension', present_line,re.IGNORECASE):
