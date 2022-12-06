@@ -50,6 +50,7 @@ class Emergency:
         self.time_to_respond = None
         zone_col = zone % city.width
         zone_row = math.floor(zone/city.width)
+        self.response_unit = None
         loc = random.randint(0, (City.zone_dimension ** 2) - 1)
         r = math.floor(loc/City.zone_dimension)
         c = loc % City.zone_dimension
@@ -99,6 +100,7 @@ class Emergency:
         emergency_units, time_taken_to_reach, waiting_time = self.allocate_teams_to_emergency()
         time_to_resolve = time_taken_to_reach + Emergency.intensity_mapping[self.intensity]['time'] + time_taken_to_reach + waiting_time
         self.time_to_respond = float(time_taken_to_reach) + waiting_time
+        self.response_unit = emergency_units
         for _ in range(int(time_to_resolve)):
             for __ in self.city_of_emergency.zone_populations:
                 random.randint(1, 1000000)

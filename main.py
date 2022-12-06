@@ -117,7 +117,7 @@ def simulate(city):
     # e4 = EmergencyUnit(3, (4, 4))
     test = city
     if test is None:
-        print("Please check the configuration file...")
+        raise ValidationError("Please check the configuration file...")
     seconds_in_a_day = 1440
     base_rate_for_emergency = 1.3615119
     base_population = 200000
@@ -126,6 +126,7 @@ def simulate(city):
     zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(test.zone_populations))
     aggregate_resp_times = []
     aggregate_perc_successful = []
+    plotting_emergency_dict = {}
     # Obtained code for displaying progress bar in for loop from: https://stackoverflow.com/questions/3160699/python-progress-bar
     for run in tqdm(range(1, 101)):
         for i in range(seconds_in_a_day):
@@ -151,6 +152,8 @@ def simulate(city):
         avg_resp_time = np.mean(np.asarray(resp_times))
         perc_successful = (successful_response_emergencies/len(resp_times))*100
         if run == 1:
+            for emergency in Emergency.emergencies[:3]:
+                plotting_emergency_dict[emergency.location] = [tuple(key.location) for key in emergency.response_unit]
             aggregate_resp_times.append(avg_resp_time)
             aggregate_perc_successful.append(perc_successful)
         else:
@@ -162,12 +165,12 @@ def simulate(city):
             aggregate_perc_successful.append(avg_perc_successful)
         Emergency.clear_emergencies()
     EmergencyUnit.clear_emergency_buildings()
-    return aggregate_resp_times, aggregate_perc_successful, number_of_emergencies
+    return aggregate_resp_times, aggregate_perc_successful, number_of_emergencies, plotting_emergency_dict
 
 
-if __name__ == '__main__':
+"""if __name__ == '__main__':
      city = configure_city_file('inner_medium_ps.txt')
      resp_times, perc_successfull, emergencies = simulate(city)
      print(f"Total number of emergencies occured: {emergencies}")
      print(f"Average response time: {resp_times[-1]}")
-     print(f"Success ratio : {perc_successfull[-1]}")
+     print(f"Success ratio : {perc_successfull[-1]}")"""
