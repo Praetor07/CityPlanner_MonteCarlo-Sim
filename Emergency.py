@@ -67,7 +67,6 @@ class Emergency:
 
     def resolve_emergency(self):
         """
-
         :return:
         >>> populations = [2500, 2500]
         >>> intensity_distributions = [1, 0, 0, 0, 0]
@@ -190,7 +189,6 @@ class Emergency:
     @staticmethod
     def clear_emergencies():
         """
-
         :return:
         >>> populations = [2000, 3500, 900, 4500, 700, 9000, 870, 4500, 2000, 400, 2400, 3000]
         >>> intensity_distributions = [0.2, 0.2, 0.2, 0.2, 0.2]
