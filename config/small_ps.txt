@@ -21,20 +21,16 @@ Width 4
 ###Intensity distribution###
 0.4 0.2 0.2 0.1 0.1
 ###Small buildings(3 teams)###
-0
+8
+3,3
+5,3
+8,3
+3,5
+3,8
+8,5
+8,8
+5,8
 ###Medium buildings(5 teams)###
-12
-0,0
-0,4
-0,8
-0,11
-4,0
-8,0
-11,0
-11,4
-11,8
-11,11
-4,11
-8,11
+0
 ###Large buildings(7 teams)###
 0
