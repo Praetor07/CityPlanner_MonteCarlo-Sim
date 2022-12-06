@@ -116,8 +116,10 @@ def simulate(city):
     # e3 = EmergencyUnit(3, (4, 1))
     # e4 = EmergencyUnit(3, (4, 4))
     test = city
+    if test is None:
+        print("Please check the configuration file...")
     seconds_in_a_day = 1440
-    base_rate_for_emergency = 13.615119
+    base_rate_for_emergency = 1.3615119
     base_population = 200000
     number_of_emergencies = 0
     base_rate_per_person = base_rate_for_emergency/base_population
@@ -164,7 +166,7 @@ def simulate(city):
 
 
 if __name__ == '__main__':
-     city = configure_city_file('hybrid_medium_ps.txt')
+     city = configure_city_file('inner_medium_ps.txt')
      resp_times, perc_successfull, emergencies = simulate(city)
      print(f"Total number of emergencies occured: {emergencies}")
      print(f"Average response time: {resp_times[-1]}")
