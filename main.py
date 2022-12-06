@@ -13,7 +13,6 @@ class ValidationError(Exception):
 
 def poisson_probability(rates: np.array) -> np.array:
     """
-
     :param rates:
     :return:
     >>> res = poisson_probability(np.asarray([0.0256, 0.349, 0.00127]))
