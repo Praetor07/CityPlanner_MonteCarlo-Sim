@@ -7,7 +7,7 @@ class EmergencyUnit:
     # Class variable - List of all emergency units (all objects of class)
     response_buildings = []
     wait_for_teams_to_be_available = False
-    type_to_capacity_mapping = {'small': 1, 'medium': 3, 'large': 5}
+    type_to_capacity_mapping = {'small': 3, 'medium': 5, 'large': 7}
     def __init__(self, size: str, location: tuple):
         """
         Initialize size and location of the emergency unit, along with number of teams currently available
