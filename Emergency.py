@@ -48,8 +48,8 @@ class Emergency:
             print('Unable to create an emergency as zone does not exist in the city.')
             return
         self.time_to_respond = None
-        zone_row = zone % city.height
-        zone_col = math.floor(zone/city.height)
+        zone_col = zone % city.width
+        zone_row = math.floor(zone/city.width)
         loc = random.randint(0, (City.zone_dimension ** 2) - 1)
         r = math.floor(loc/City.zone_dimension)
         c = loc % City.zone_dimension
