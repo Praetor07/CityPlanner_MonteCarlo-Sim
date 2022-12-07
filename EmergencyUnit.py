@@ -31,7 +31,7 @@ class EmergencyUnit:
         >>> e= EmergencyUnit('medium', (1,3))
         >>> e.relieve_response_teams(1)
         >>> e.available_capacity
-        4
+        6
         """
         EmergencyUnit.wait_for_teams_to_be_available = False
         self.available_capacity += relieved_units
@@ -46,7 +46,7 @@ class EmergencyUnit:
         >>> e= EmergencyUnit('medium', (1,2))
         >>> e.dispatch_teams(1)
         >>> e.available_capacity
-        2
+        4
         """
         self.available_capacity -= required_units
 

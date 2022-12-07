@@ -142,10 +142,6 @@ class City:
         ...         zone_dict[zone] = 1
         >>> set(zone_dict.values()) == {City.zone_dimension**2}
         True
-        >>> city =  City(2, 1, [400], [0.4, 0.2, 0.2, 0.1, 0.1]) # doctest +ELLIPSIS
-        Exception raised:
-        ...
-        Exception: Specify zone population for all width x height number of zones
         """
 
         # Adding Nodes

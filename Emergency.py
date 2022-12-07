@@ -24,19 +24,23 @@ class Emergency:
         >>> populations = [2000, 3500, 900, 4500, 700, 9000, 870, 4500, 2000, 400, 2400, 3000]
         >>> intensity_distributions = [0.2, 0.2, 0.2, 0.2, 0.2]
         >>> test1 = City(4, 3, populations, intensity_distributions)
-        >>> e1=Emergency(test1, 2)
+        >>> e1 = EmergencyUnit('large', (1, 7))
+        >>> e2 = EmergencyUnit('large', (3, 2))
+        >>> e3 = EmergencyUnit('large', (5, 0))
+        >>> e4 = EmergencyUnit('large', (7, 10))
+        >>> e1=Emergency(test1, 8)
         >>> 6 <= e1.location[0] <= 8
         True
         >>> 0 <= e1.location[1] <= 2
         True
-        >>> e2=Emergency(test1, 6)
+        >>> e2=Emergency(test1, 2)
         >>> 0 <= e2.location[0] <= 2
         True
         >>> 6 <= e2.location[1] <= 8
         True
         >>> 1 <= e2.intensity <= 5
         True
-        >>> e3=Emergency(test1, 10)
+        >>> e3=Emergency(test1, 7)
         >>> 3 <= e3.location[0] <= 5
         True
         >>> 9 <= e3.location[1] <= 11
@@ -94,7 +98,7 @@ class Emergency:
         >>> e18 = EmergencyUnit('small', (0, 0))
         >>> e = Emergency(test, 0)
         >>> e.resolve_emergency()
-        >>> e.time_to_respond > 1
+        >>> e.time_to_respond == 1.0
         True
         """
         emergency_units, time_taken_to_reach, waiting_time = self.allocate_teams_to_emergency()
@@ -138,11 +142,11 @@ class Emergency:
         >>> e17 = EmergencyUnit('small', (1, 0))
         >>> e18 = EmergencyUnit('small', (0, 0))
         >>> e = Emergency(test, 0)
-        >>> unit_loc, avg_time = e.allocate_teams_to_emergency()
+        >>> unit_loc, avg_time, wait_time = e.allocate_teams_to_emergency()
         >>> avg_time > 1
         True
-        >>> list(unit_loc.values())[0]
-        1
+        >>> list(unit_loc.values())[0] > 1
+        True
         >>> 0 <= list(unit_loc.keys())[0].location[0] <= 2
         True
         >>> 0 <= list(unit_loc.keys())[0].location[1] <= 5

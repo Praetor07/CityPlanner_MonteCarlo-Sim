@@ -16,11 +16,11 @@ def poisson_probability(rates: np.array) -> np.array:
     :param rates:
     :return:
     >>> res = poisson_probability(np.asarray([0.0256, 0.349, 0.00127]))
-    >>> [round(prob, 5) for prob in res]
+    >>> [round(p, 5) for p in res]
     [0.02495, 0.24618, 0.00127]
     """
     if rates.dtype == np.float64:
-        return rates * np.exp(-1*rates)
+        return 1 - np.exp(-1*rates)
     else:
         raise ValueError("Rates cannot be converted to poisson probabilities ")
 
@@ -103,27 +103,16 @@ def configure_city_file(configuration_file: str):
     except ValidationError as v:
         print(v)
 
-def simulate(city):
+def simulate(test_city):
     thread_list = []
-    # populations = [2400, 3500, 900, 4500]
-    # intensity_distributions = [0.2, 0.2, 0.2, 0.2, 0.2]
-    # test = City(2, 2, populations, intensity_distributions)
-    # test.build_city_graph()
-    # print(test.city_graph.nodes)
-    # nx.draw(test.city_graph, with_labels=True)
-    # e1 = EmergencyUnit(3, (1, 1))
-    # e2 = EmergencyUnit(3, (1, 4))
-    # e3 = EmergencyUnit(3, (4, 1))
-    # e4 = EmergencyUnit(3, (4, 4))
-    test = city
-    if test is None:
+    if test_city is None:
         raise ValidationError("Please check the configuration file...")
     seconds_in_a_day = 1440
-    base_rate_for_emergency = 1.3615119
+    base_rate_for_emergency = 13.165119
     base_population = 200000
     number_of_emergencies = 0
     base_rate_per_person = base_rate_for_emergency/base_population
-    zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(test.zone_populations))
+    zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(test_city.zone_populations))
     aggregate_resp_times = []
     aggregate_perc_successful = []
     plotting_emergency_dict = {}
@@ -131,11 +120,11 @@ def simulate(city):
     for run in tqdm(range(1, 101)):
         for i in range(seconds_in_a_day):
             if i in [359, 719, 1079]:
-                test.update_graph_edges(math.floor((i+1)/360))
+                test_city.update_graph_edges(math.floor((i+1)/360))
             for zone in range(len(zone_probabilities)):
                 prob = zone_probabilities[zone]*1000000
                 if random.randint(1, 1000000) <= prob:
-                    th = Thread(target=Emergency, args=[city, zone], daemon=False)
+                    th = Thread(target=Emergency, args=[test_city, zone], daemon=False)
                     th.start()
                     thread_list.append(th)
         for th in thread_list:
@@ -148,7 +137,6 @@ def simulate(city):
             if emergency.time_to_respond <= Emergency.resolution_time_threshold:
                 successful_response_emergencies += 1
             resp_times.append(emergency.time_to_respond)
-        # print("{}
         avg_resp_time = np.mean(np.asarray(resp_times))
         perc_successful = (successful_response_emergencies/len(resp_times))*100
         if run == 1:
