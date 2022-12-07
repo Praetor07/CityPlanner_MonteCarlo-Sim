@@ -140,7 +140,7 @@ def simulate(test_city):
         avg_resp_time = np.mean(np.asarray(resp_times))
         perc_successful = (successful_response_emergencies/len(resp_times))*100
         if run == 1:
-            for emergency in Emergency.emergencies[:3]:
+            for emergency in Emergency.emergencies[:5]:
                 plotting_emergency_dict[emergency.location] = [tuple(key.location) for key in emergency.response_unit]
             aggregate_resp_times.append(avg_resp_time)
             aggregate_perc_successful.append(perc_successful)
