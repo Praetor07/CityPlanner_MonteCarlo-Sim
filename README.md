@@ -29,6 +29,7 @@ This project is a Monte-Carlo simulation of a city with random emergency situati
 **Design Entities**
 
 1) City Configuration
+
 Assumptions: 
 - Within each zone, the population is uniformly distributed.
 - Each City is divided into zones with equal areas
@@ -50,6 +51,7 @@ Each zone in a city represents a 3X3 square grid. The diagram below shows an exa
 
 
 2) Emergency Units
+
 Assumptions:
 - Emergencies are resolved using available teams from one or more emergency unit buildings.
 - Teams in the emergency units are not available when responding to an emergency but commuting to the location of the emergency, resolving an emergency, and commuting back to their base location.
@@ -63,6 +65,7 @@ An example of small, medium and large emergency units positioned across the city
 ![img_4.png](img_4.png)
 
 3) Emergency
+
 Assumptions:
 ![img_5.png](img_5.png)
 
