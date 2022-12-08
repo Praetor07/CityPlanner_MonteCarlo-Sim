@@ -1,4 +1,4 @@
-**Emergency Response Monte-Carlo Simulation for City Planning**
+# Emergency Response Monte-Carlo Simulation for City Planning
 
 
 **Background:**
@@ -57,7 +57,7 @@ Assumptions:
 - Teams in the emergency units are not available when responding to an emergency but commuting to the location of the emergency, resolving an emergency, and commuting back to their base location.
 
 Configurable Parameters:
-- # Small, # Medium and # Large Emergency Units
+- Number of Small, Medium and Large Emergency Units
 - Position of each emergency unit as city coordinates
 
 An example of small, medium and large emergency units positioned across the city:
