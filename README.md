@@ -47,7 +47,7 @@ Configurable Parameters:
 - Population of each zone
 
 Each zone in a city represents a 3X3 square grid. The diagram below shows an example city configured with a width and height of 4 zones.
-![img_2.png](img_2.png)
+![img_2.png](images/img_2.png)
 
 
 2) Emergency Units
@@ -61,25 +61,25 @@ Configurable Parameters:
 - Position of each emergency unit as city coordinates
 
 An example of small, medium and large emergency units positioned across the city:
-![img_3.png](img_3.png)
-![img_4.png](img_4.png)
+![img_3.png](images/img_3.png)
+![img_4.png](images/img_4.png)
 
 3) Emergency
 
 Assumptions:
-![img_5.png](img_5.png)
+![img_5.png](images/img_5.png)
 
 Configurable Parameters:
 - Probability of occurrence of each emergency intensity
 
 Flow of emergency creation, using an example of 16 zones given the population of each zone:
-![img_7.png](img_7.png)
+![img_7.png](images/img_7.png)
 
 Flow of emergency resolution:
-![img_8.png](img_8.png)
+![img_8.png](images/img_8.png)
 
 An example of emergency being responded to by teams from an emergency unit using the optimal path:
-![img_9.png](img_9.png)
+![img_9.png](images/img_9.png)
 
 **Instructions for Code Execution:**
 1) Each run of the simulation represents a span of one day, and 100 runs of the simulation are executed.
