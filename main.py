@@ -17,7 +17,7 @@ def poisson_probability(rates: np.array) -> np.array:
     :return:
     >>> res = poisson_probability(np.asarray([0.0256, 0.349, 0.00127]))
     >>> [round(p, 5) for p in res]
-    [0.02495, 0.24618, 0.00127]
+    [0.02528, 0.29461, 0.00127]
     """
     if rates.dtype == np.float64:
         return 1 - np.exp(-1*rates)
