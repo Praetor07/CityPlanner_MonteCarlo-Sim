@@ -9,7 +9,13 @@ import numpy as np
 from tqdm import tqdm
 
 class ValidationError(Exception):
-    pass
+    def __init__(self, x: int, flag: str):
+        self.x = x
+        self.flag = flag
+
+    def __str__(self):
+        return f"Kindly check {self.flag}, its passed as {self.x}. This isnt correct. It should be greater than 0"
+
 
 
 def poisson_probability(rates: np.array) -> np.array:
@@ -28,9 +34,16 @@ def poisson_probability(rates: np.array) -> np.array:
     else:
         raise ValueError("Rates cannot be converted to poisson probabilities ")
 
+
 def configure_city_file(configuration_file: str):
     """
     Function to read the configuration file and construct the city
+    List of validations being conducted:
+    Height/width > 0
+    No two Emergency response units should share the same unit
+    Only numeric values should be passed
+    Population should be greater than 0
+    Intensity distributions should sum up to 1
     :return:
     """
     city_init = 0
@@ -46,11 +59,11 @@ def configure_city_file(configuration_file: str):
                             if re.search('height', temp_string, re.IGNORECASE):
                                 height = int(temp_string.split(' ')[-1])
                                 if height <= 0:
-                                    raise ValidationError("Kindly check values again. Number is less than 0")
+                                    raise ValidationError(height, "height")
                             if re.search('width', temp_string, re.IGNORECASE):
                                 width = int(temp_string.split(' ')[-1])
                                 if width <= 0:
-                                    raise ValidationError("Kindly check values again. Number is less than 0")
+                                    raise ValidationError(width, "width")
                             counter += 1
                     if re.search('population', present_line, re.IGNORECASE):
                         city_init += 1
@@ -59,7 +72,7 @@ def configure_city_file(configuration_file: str):
                         while counter < height*width:
                             population = int(f.readline().split()[0])
                             if population <= 0:
-                                raise Exception("Population should be greater than 0")
+                                raise ValidationError(population, "population")
                             populations_list[counter] = population
                             counter += 1
                     if re.search('intensity', present_line, re.IGNORECASE):
@@ -102,10 +115,14 @@ def configure_city_file(configuration_file: str):
                             counter += 1
                     present_line = f.readline()
                 return city_configured
-    except ValueError:
-        print("\n###Please only enter numeric values in the configuration file###")
+    except ValueError as v:
+        if re.search("int", v.__str__()):
+            print("\n###Kindly check the file, only numeric values are allowed###")
+        else:
+            print(v)
     except ValidationError as v:
         print(v)
+
 
 
 def simulate(test_city):
@@ -124,61 +141,66 @@ def simulate(test_city):
     entire duration of the simulations, dictionary of details of first 3 emergencies used for visualizations.
     """
     thread_list = []
-    if test_city is None:
-        raise ValidationError("Please check the configuration file...")
     seconds_in_a_day = 1440
-    base_rate_for_emergency = 13.165119
+    base_rate_for_emergency = 1.3165119
     base_population = 200000
     number_of_emergencies = 0
-    base_rate_per_person = base_rate_for_emergency/base_population
-    zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(test_city.zone_populations))
     aggregate_resp_times = []
     aggregate_perc_successful = []
     plotting_emergency_dict = {}
-    # Obtained code for displaying progress bar in for loop from:
-    # https://stackoverflow.com/questions/3160699/python-progress-bar
-    for run in tqdm(range(1, 101)):
-        for i in range(seconds_in_a_day):
-            if i in [0, 359, 719, 1079]:
-                test_city.update_graph_edges(math.floor((i+1)/360))
-            for zone in range(len(zone_probabilities)):
-                prob = zone_probabilities[zone]*1000000
-                if random.randint(1, 1000000) <= prob:
-                    th = Thread(target=Emergency, args=[test_city, zone], daemon=False)
-                    th.start()
-                    thread_list.append(th)
-        for th in thread_list:
-            th.join()
-        thread_list = []
-        resp_times = list()
-        successful_response_emergencies = 0
-        for emergency in Emergency.emergencies:
-            number_of_emergencies += 1
-            if emergency.time_to_respond <= Emergency.resolution_time_threshold:
-                successful_response_emergencies += 1
-            resp_times.append(emergency.time_to_respond)
-        avg_resp_time = np.mean(np.asarray(resp_times))
-        perc_successful = (successful_response_emergencies/len(resp_times))*100
-        if run == 1:
-            for emergency in Emergency.emergencies[:5]:
-                plotting_emergency_dict[emergency.location] = [tuple(key.location) for key in emergency.response_unit]
-            aggregate_resp_times.append(avg_resp_time)
-            aggregate_perc_successful.append(perc_successful)
-        else:
-            resp_time_sum_until_now = aggregate_resp_times[-1] * len(aggregate_resp_times)
-            avg_resp_time = (resp_time_sum_until_now + avg_resp_time)/run
-            aggregate_resp_times.append(avg_resp_time)
-            perc_sum_until_now = aggregate_perc_successful[-1] * len(aggregate_perc_successful)
-            avg_perc_successful = (perc_sum_until_now + perc_successful)/run
-            aggregate_perc_successful.append(avg_perc_successful)
-        Emergency.clear_emergencies()
-    EmergencyUnit.clear_emergency_buildings()
-    return aggregate_resp_times, aggregate_perc_successful, number_of_emergencies, plotting_emergency_dict
+    try:
+        if test_city is None:
+            raise ValueError("Kindly check file again...")
+        base_rate_per_person = base_rate_for_emergency/base_population
+        zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(test_city.zone_populations))
+        # Obtained code for displaying progress bar in for loop from:
+        # https://stackoverflow.com/questions/3160699/python-progress-bar
+        for run in tqdm(range(1, 101)):
+            for i in range(seconds_in_a_day):
+                if i in [0, 359, 719, 1079]:
+                    test_city.update_graph_edges(math.floor((i+1)/360))
+                for zone in range(len(zone_probabilities)):
+                    prob = zone_probabilities[zone]*1000000
+                    if random.randint(1, 1000000) <= prob:
+                        th = Thread(target=Emergency, args=[test_city, zone], daemon=False)
+                        th.start()
+                        thread_list.append(th)
+            for th in thread_list:
+                th.join()
+            thread_list = []
+            resp_times = list()
+            successful_response_emergencies = 0
+            for emergency in Emergency.emergencies:
+                number_of_emergencies += 1
+                if emergency.time_to_respond <= Emergency.resolution_time_threshold:
+                    successful_response_emergencies += 1
+                resp_times.append(emergency.time_to_respond)
+            avg_resp_time = np.mean(np.asarray(resp_times))
+            perc_successful = (successful_response_emergencies/len(resp_times))*100
+            if run == 1:
+                for emergency in Emergency.emergencies[:5]:
+                    plotting_emergency_dict[emergency.location] = [tuple(key.location) for key in emergency.response_unit]
+                aggregate_resp_times.append(avg_resp_time)
+                aggregate_perc_successful.append(perc_successful)
+            else:
+                resp_time_sum_until_now = aggregate_resp_times[-1] * len(aggregate_resp_times)
+                avg_resp_time = (resp_time_sum_until_now + avg_resp_time)/run
+                aggregate_resp_times.append(avg_resp_time)
+                perc_sum_until_now = aggregate_perc_successful[-1] * len(aggregate_perc_successful)
+                avg_perc_successful = (perc_sum_until_now + perc_successful)/run
+                aggregate_perc_successful.append(avg_perc_successful)
+            Emergency.clear_emergencies()
+        EmergencyUnit.clear_emergency_buildings()
+        return aggregate_resp_times, aggregate_perc_successful, number_of_emergencies, plotting_emergency_dict
+    except ValueError as v:
+        print(v)
+    return [0], [0], [], {}
 
 
-"""if __name__ == '__main__':
+
+if __name__ == '__main__':
      city = configure_city_file('inner_medium_ps.txt')
-     resp_times, perc_successfull, emergencies = simulate(city)
+     resp_times, perc_successfull, emergencies, plotting_emergency_dict = simulate(city)
      print(f"Total number of emergencies occured: {emergencies}")
      print(f"Average response time: {resp_times[-1]}")
-     print(f"Success ratio : {perc_successfull[-1]}")"""
+     print(f"Success ratio : {perc_successfull[-1]}")

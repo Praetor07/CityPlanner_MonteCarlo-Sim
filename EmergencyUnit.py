@@ -15,7 +15,7 @@ class EmergencyUnit:
         if self.check_emergency_building_coordinates():
             EmergencyUnit.response_buildings.append(self)
         else:
-            raise ValueError("Coordinates are duplicate for EmergencyResponse unit buildings..")
+            raise ValueError(f"Coordinates are duplicate for EmergencyResponse unit buildings.. - {self.location}")
 
     def relieve_response_teams(self, relieved_units):
         """

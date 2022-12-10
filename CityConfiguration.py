@@ -56,7 +56,6 @@ class City:
         for i in range(len(zone_populations)):
             for _ in range(City.zone_dimension ** 2):  # number of nodes per zone?
                 self.coordinate_populations.append(zone_populations[i] / (City.zone_dimension ** 2))
-
         self.city_graph = nx.Graph()
         self.build_city_graph()
         self.likely_vals = self.zone_populations / np.sum(self.zone_populations)
@@ -164,7 +163,6 @@ class City:
                 self.city_graph.add_edge((i, j), (i, j + 1), adjusted_time=City.default_commute_time)
             if self.city_graph.has_node((i + 1, j)):
                 self.city_graph.add_edge((i, j), (i + 1, j), adjusted_time=City.default_commute_time)
-
 
     def update_graph_edges(self, time_of_day: int):
         """
