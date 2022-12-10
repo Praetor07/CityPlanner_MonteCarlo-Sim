@@ -11,10 +11,14 @@ from tqdm import tqdm
 class ValidationError(Exception):
     pass
 
+
 def poisson_probability(rates: np.array) -> np.array:
     """
-    :param rates:
-    :return:
+    Given an input numpy array of the per-minute rates of emergency for each zone in the city, calculates and returns
+    the probability of an emergency occuring within the next minute in each zone of the city. The probability is
+    calculated using the poisson distribution, by finding:  1 - Probability(no emergency occuring within next minute)
+    :param rates: Numpy array representing the rates of emergency for each zone in the city
+    :return: Numpy array of the probabilities of emergency occurring in the next 1 minute, in each zone of the city
     >>> res = poisson_probability(np.asarray([0.0256, 0.349, 0.00127]))
     >>> [round(p, 5) for p in res]
     [0.02528, 0.29461, 0.00127]
@@ -103,7 +107,22 @@ def configure_city_file(configuration_file: str):
     except ValidationError as v:
         print(v)
 
+
 def simulate(test_city):
+    """
+    Performs a Monte-Carlo simulation with 100 runs and each run representing a span of 1 day, of emergencies occurring
+    at randomized time and locations within the city, with randomly chosen intensities in the scale of 1 to 5.
+    The traffic present across the different paths in the city is randomized and updated 4 times in a day, over the
+    span of every 6 hours. The emergencies occurring are responded to by the emergency units configured in specific
+    locations across the city, and the statistics of average response time and percentage of successfully responded
+    emergencies are calculated for each run of the simulation, and are aggregated over all the 100 runs.
+
+    :param test_city: The CityConfiguration object representing the city configured in the simulation - with a
+    defined width, height, population of each zone, and emergency units at specific locations.
+    :return: List of average responses times aggregated after each simulation run, list of percentage of successfully
+    responded emergencies aggregated after each simulation run, total number of emergencies that occurred in the
+    entire duration of the simulations, dictionary of details of first 3 emergencies used for visualizations.
+    """
     thread_list = []
     if test_city is None:
         raise ValidationError("Please check the configuration file...")
@@ -116,10 +135,11 @@ def simulate(test_city):
     aggregate_resp_times = []
     aggregate_perc_successful = []
     plotting_emergency_dict = {}
-    # Obtained code for displaying progress bar in for loop from: https://stackoverflow.com/questions/3160699/python-progress-bar
+    # Obtained code for displaying progress bar in for loop from:
+    # https://stackoverflow.com/questions/3160699/python-progress-bar
     for run in tqdm(range(1, 101)):
         for i in range(seconds_in_a_day):
-            if i in [359, 719, 1079]:
+            if i in [0, 359, 719, 1079]:
                 test_city.update_graph_edges(math.floor((i+1)/360))
             for zone in range(len(zone_probabilities)):
                 prob = zone_probabilities[zone]*1000000

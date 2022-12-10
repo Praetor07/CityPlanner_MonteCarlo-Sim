@@ -8,19 +8,28 @@ from EmergencyUnit import EmergencyUnit
 
 
 class Emergency:
+    """
+    Emergency entity which represents the emergencies occurring throughout the city.
+    """
     lock = threading.Lock()
-    # Class variable - Dictionary mapping different intensities to number of emergency teams and total time taken to
-    # resolve once team reaches location of emergency
+    # Dictionary mapping different intensities to number of emergency teams and total time taken to
+    # resolve each intensity type of emergency, once team reaches the location of the emergency.
     intensity_mapping = {1: {'teams': 3, 'time': 5}, 2: {'teams': 4, 'time': 10}, 3: {'teams': 5, 'time': 15},
                          4: {'teams': 6, 'time': 20}, 5: {'teams': 7, 'time': 25}}
-    # Class variable - Threshold of time for emergency resolution for it to be considered successfully resolved.
+    # Threshold of time, in minutes, for emergency resolution in order for it to be considered as successfully resolved.
     resolution_time_threshold = 10
-    # Class variable - List containing time taken for resolution of each emergency
+    # List containing all the Emergency objects over one simulation run
     emergencies = []
 
     def __init__(self, city: City, zone: int):
         """
-        Initialize location and intensity of emergency using probability distributions.
+        Randomize the location of emergency within the specified zone, using a uniform distribution, and
+        randomize the intensity of the emergency using the user provided probabilites. The number
+        of teams required to resolve the emergency is also initialized using the pre-defined dictionary mapping,
+        and the emergency is attempted to be resolved.
+        :param city: City configured where the emergency is taking place
+        :param zone: Zone number of the city, counted from 0 row-wise, where the emergency occurs
+        :return: None
         >>> populations = [2000, 3500, 900, 4500, 700, 9000, 870, 4500, 2000, 400, 2400, 3000]
         >>> intensity_distributions = [0.2, 0.2, 0.2, 0.2, 0.2]
         >>> test1 = City(4, 3, populations, intensity_distributions)
@@ -69,10 +78,16 @@ class Emergency:
         Emergency.emergencies.append(self)
         self.resolve_emergency()
 
-
     def resolve_emergency(self):
         """
-        :return:
+        Invokes the core logic of the simulation to allocate the required number of available teams from optimal
+        locations of the emergency units, in order to resolve the emergency. Once the optimal allocation of teams
+        from one or more emergency units is calculated, the simulation performs the computation representing
+        the passage of time, which represents the teams being busy and unavailable to respond to other emergencies.
+        Once the specified amount of time required for the teams to commute to the location of the emergency, resolve
+        the emergency and commute back to their original location(s) has elapsed, the teams are released and are
+        free to respond to subsequent emergencies.
+        :return: None
         >>> populations = [2500, 2500]
         >>> intensity_distributions = [1, 0, 0, 0, 0]
         >>> test = City(2, 1, populations, intensity_distributions)
@@ -102,7 +117,8 @@ class Emergency:
         True
         """
         emergency_units, time_taken_to_reach, waiting_time = self.allocate_teams_to_emergency()
-        time_to_resolve = time_taken_to_reach + Emergency.intensity_mapping[self.intensity]['time'] + time_taken_to_reach + waiting_time
+        time_to_resolve = time_taken_to_reach + Emergency.intensity_mapping[self.intensity]['time'] + \
+                          time_taken_to_reach + waiting_time
         self.time_to_respond = float(time_taken_to_reach) + waiting_time
         self.response_unit = emergency_units
         for _ in range(int(time_to_resolve)):
@@ -111,13 +127,22 @@ class Emergency:
         for emergency_unit, num_teams in emergency_units.items():
             emergency_unit.relieve_response_teams(num_teams)
 
-
     def allocate_teams_to_emergency(self):
         """
-        Optimally allocate the required number of teams to resolve the emergency by finding the nearest available teams
-        - calculating the time required to respond to the emergency and updating number of available teams in the
-        emergency units from which teams are being dispatched.
-        :return:
+        Optimally allocate the required number of teams to resolve the emergency by finding the available teams
+        from one or more emergency units. Calculate the time required to respond to the emergency as the average of
+        the time required for each of the teams to commute to the location of the emergency using the Dijkstra's
+        shortest path algorithm. Update the number of available teams in the emergency units from which teams are being
+        dispatched.
+        In the scenario that no emergency units have teams available, then the emergency waits for the
+        required number of teams to become available, and the waiting time is also recorded.
+        Since each emergency is created on a separate thread, a locking mechanism is added to the logic in this method
+        in order to prevent race conditions, and ensure that the optimal allocation of teams calculation is performed
+        for only one thread (emergency) at one point in time.
+        :return: Dictionary containing mapping of emergency unit objects to the time required for teams from each
+        of the allocated emergency units to reach the location of the emergency (respond to the emergency), the
+        response time in minutes for the particular emergency, waiting time (if any) in minutes that was involved
+        in waiting for required number of teams to become available.
         >>> populations = [2500, 2500]
         >>> intensity_distributions = [0, 1, 0, 0, 0]
         >>> test = City(2, 1, populations, intensity_distributions)
@@ -195,7 +220,8 @@ class Emergency:
     @staticmethod
     def clear_emergencies():
         """
-        :return:
+        Clears the list of emergencies stored for each simulation run, at the end of each simulation run.
+        :return: None
         >>> populations = [2000, 3500, 900, 4500, 700, 9000, 870, 4500, 2000, 400, 2400, 3000]
         >>> intensity_distributions = [0.2, 0.2, 0.2, 0.2, 0.2]
         >>> test2 = City(4, 3, populations, intensity_distributions)

@@ -88,3 +88,7 @@ An example of emergency being responded to by teams from an emergency unit using
 4) Then, output statistics obtained from each simulation run are aggregated and plotted, through which convergence of the statistics can be visualized.
 
 **Hypothesis 1 and Hypothesis 2 are described in, and can be executed using their respective Jupyter Notebooks.**
+
+**References**
+1) https://commonslibrary.parliament.uk/research-briefings/cdp-2022-0126/ 
+2) https://www.kaggle.com/datasets/mchirico/montcoalert (Kaggle dataset from montcoalert.org)

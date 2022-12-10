@@ -22,16 +22,17 @@ Width 4
 0.4 0.2 0.2 0.1 0.1
 ###Small buildings(3 teams)###
 1
-4,1
+5,5
 ###Medium buildings(5 teams)###
 3
-1,6
-4,10
-8,4
+2,6
+8,9
+8,2
 ###Large buildings(7 teams)###
-5
+6
 1,1
 1,10
-5,5
+4,1
+4,10
 10,1
-9,9
+10,10
