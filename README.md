@@ -92,3 +92,5 @@ An example of emergency being responded to by teams from an emergency unit using
 **References**
 1) https://commonslibrary.parliament.uk/research-briefings/cdp-2022-0126/ 
 2) https://www.kaggle.com/datasets/mchirico/montcoalert (Kaggle dataset from montcoalert.org)
+3) https://stackoverflow.com/questions/3160699/python-progress-bar
+4) https://coderslegacy.com/python/lock-in-with-statement/

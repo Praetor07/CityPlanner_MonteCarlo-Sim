@@ -1,3 +1,6 @@
+"""
+Driver program containing functions that control the input and execution of the Monte-Carlo Simulation.
+"""
 import math
 import random
 import re
@@ -8,14 +11,17 @@ from threading import Thread
 import numpy as np
 from tqdm import tqdm
 
+
 class ValidationError(Exception):
+    """
+    Custom Error class for handling user configuration input exceptions.
+    """
     def __init__(self, x: int, flag: str):
         self.x = x
         self.flag = flag
 
     def __str__(self):
         return f"Kindly check {self.flag}, its passed as {self.x}. This isnt correct. It should be greater than 0"
-
 
 
 def poisson_probability(rates: np.array) -> np.array:
@@ -63,72 +69,72 @@ def configure_city_file(configuration_file: str):
     city_init = 0
     try:
         with open(f"./config/{configuration_file}", 'r') as f:
+            present_line = f.readline()
+            while present_line:
+                if re.search('dimension', present_line, re.IGNORECASE):
+                    counter = 0
+                    city_init += 1
+                    while counter < 2:
+                        temp_string = f.readline()
+                        if re.search('height', temp_string, re.IGNORECASE):
+                            height = int(temp_string.split(' ')[-1])
+                            if height <= 0:
+                                raise ValidationError(height, "height")
+                        if re.search('width', temp_string, re.IGNORECASE):
+                            width = int(temp_string.split(' ')[-1])
+                            if width <= 0:
+                                raise ValidationError(width, "width")
+                        counter += 1
+                if re.search('population', present_line, re.IGNORECASE):
+                    city_init += 1
+                    populations_list = np.empty(width * height)
+                    counter = 0
+                    while counter < height*width:
+                        population = int(f.readline().split()[0])
+                        if population <= 0:
+                            raise ValidationError(population, "population")
+                        populations_list[counter] = population
+                        counter += 1
+                if re.search('intensity', present_line, re.IGNORECASE):
+                    city_init += 1
+                    intensity = f.readline()
+                    intensity_distributions = np.asarray([float(i) for i in intensity.split(' ')])
+                    if intensity_distributions.sum() != 1:
+                        raise Exception("Intensity distributions should sum to 1")
+                if city_init == 3:
+                    city_configured = City(width, height, populations_list, intensity_distributions)
+                if re.search('small building', present_line, re.IGNORECASE):
+                    count_of_small_buildings = int(f.readline().split()[0])
+                    counter = 0
+                    while counter < count_of_small_buildings:
+                        coordinate = f.readline().strip().split(',')
+                        if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
+                            print("Please enter valid coordinates according to the city configured.")
+                        else:
+                            EmergencyUnit("small", (int(coordinate[0]), int(coordinate[1])))
+                        counter += 1
+                if re.search('medium building', present_line, re.IGNORECASE):
+                    count_of_medium_buildings = int(f.readline().strip().split()[0])
+                    counter = 0
+                    while counter < count_of_medium_buildings:
+                        coordinate = f.readline().split(',')
+                        if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
+                            print("Please enter valid coordinates according to the city configured.")
+                        else:
+                            EmergencyUnit("medium", (int(coordinate[0]), int(coordinate[1])))
+                        counter += 1
+                if re.search('large building', present_line, re.IGNORECASE):
+                    count_of_large_buildings = int(f.readline().strip().split()[0])
+                    counter = 0
+                    while counter < count_of_large_buildings:
+                        coordinate = f.readline().split(',')
+                        if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
+                            print("Please enter valid coordinates according to the city configured.")
+                        else:
+                            EmergencyUnit("large", (int(coordinate[0]), int(coordinate[1])))
+                        counter += 1
                 present_line = f.readline()
-                while present_line:
-                    if re.search('dimension', present_line,re.IGNORECASE):
-                        counter = 0
-                        city_init += 1
-                        while counter < 2:
-                            temp_string = f.readline()
-                            if re.search('height', temp_string, re.IGNORECASE):
-                                height = int(temp_string.split(' ')[-1])
-                                if height <= 0:
-                                    raise ValidationError(height, "height")
-                            if re.search('width', temp_string, re.IGNORECASE):
-                                width = int(temp_string.split(' ')[-1])
-                                if width <= 0:
-                                    raise ValidationError(width, "width")
-                            counter += 1
-                    if re.search('population', present_line, re.IGNORECASE):
-                        city_init += 1
-                        populations_list = np.empty(width * height)
-                        counter = 0
-                        while counter < height*width:
-                            population = int(f.readline().split()[0])
-                            if population <= 0:
-                                raise ValidationError(population, "population")
-                            populations_list[counter] = population
-                            counter += 1
-                    if re.search('intensity', present_line, re.IGNORECASE):
-                        city_init += 1
-                        intensity = f.readline()
-                        intensity_distributions = np.asarray([float(i) for i in intensity.split(' ')])
-                        if intensity_distributions.sum() != 1:
-                            raise Exception("Intensity distributions should sum to 1")
-                    if city_init == 3:
-                        city_configured = City(width, height, populations_list, intensity_distributions)
-                    if re.search('small building', present_line, re.IGNORECASE):
-                        count_of_small_buildings = int(f.readline().split()[0])
-                        counter = 0
-                        while counter < count_of_small_buildings:
-                            coordinate = f.readline().strip().split(',')
-                            if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
-                                print("Please enter valid coordinates according to the city configured.")
-                            else:
-                                EmergencyUnit("small", (int(coordinate[0]), int(coordinate[1])))
-                            counter += 1
-                    if re.search('medium building', present_line, re.IGNORECASE):
-                        count_of_medium_buildings = int(f.readline().strip().split()[0])
-                        counter = 0
-                        while counter < count_of_medium_buildings:
-                            coordinate = f.readline().split(',')
-                            if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
-                                print("Please enter valid coordinates according to the city configured.")
-                            else:
-                                EmergencyUnit("medium", (int(coordinate[0]), int(coordinate[1])))
-                            counter += 1
-                    if re.search('large building', present_line, re.IGNORECASE):
-                        count_of_large_buildings = int(f.readline().strip().split()[0])
-                        counter = 0
-                        while counter < count_of_large_buildings:
-                            coordinate = f.readline().split(',')
-                            if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
-                                print("Please enter valid coordinates according to the city configured.")
-                            else:
-                                EmergencyUnit("large", (int(coordinate[0]), int(coordinate[1])))
-                            counter += 1
-                    present_line = f.readline()
-                return city_configured
+            return city_configured
     except ValueError as v:
         if re.search("int", v.__str__()):
             print("###Kindly check the file, only numeric values are allowed###")
@@ -136,7 +142,6 @@ def configure_city_file(configuration_file: str):
             print(v)
     except ValidationError as v:
         print(v)
-
 
 
 def simulate(test_city):
@@ -193,7 +198,8 @@ def simulate(test_city):
             perc_successful = (successful_response_emergencies/len(resp_times))*100
             if run == 1:
                 for emergency in Emergency.emergencies[:5]:
-                    plotting_emergency_dict[emergency.location] = [tuple(key.location) for key in emergency.response_unit]
+                    plotting_emergency_dict[emergency.location] = [tuple(key.location) for key in
+                                                                   emergency.response_unit]
                 aggregate_resp_times.append(avg_resp_time)
                 aggregate_perc_successful.append(perc_successful)
             else:
@@ -211,10 +217,9 @@ def simulate(test_city):
     return [0], [0], [], {}
 
 
-
-if __name__ == '__main__':
-     city = configure_city_file('inner_medium_ps.txt')
-     resp_times, perc_successfull, emergencies, plotting_emergency_dict = simulate(city)
-     print(f"Total number of emergencies occured: {emergencies}")
-     print(f"Average response time: {resp_times[-1]}")
-     print(f"Success ratio : {perc_successfull[-1]}")
+# if __name__ == '__main__':
+#      city = configure_city_file('inner_medium_ps.txt')
+#      resp_times, perc_successfull, emergencies, plotting_emergency_dict = simulate(city)
+#      print(f"Total number of emergencies occured: {emergencies}")
+#      print(f"Average response time: {resp_times[-1]}")
+#      print(f"Success ratio : {perc_successfull[-1]}")
