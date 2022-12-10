@@ -75,7 +75,7 @@ class EmergencyUnit:
         >>> e1= EmergencyUnit('medium', (2,2)) # doctest: +ELLIPSIS
         Traceback (most recent call last):
         ...
-        ValueError: Coordinates are duplicate for EmergencyResponse unit buildings..
+        ValueError: Coordinates are duplicate for EmergencyResponse unit buildings.. - (2, 2)
         """
         flag = True
         for unit in EmergencyUnit.response_buildings:

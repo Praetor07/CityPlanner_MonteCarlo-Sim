@@ -45,6 +45,20 @@ def configure_city_file(configuration_file: str):
     Population should be greater than 0
     Intensity distributions should sum up to 1
     :return:
+
+    >>> configure_city_file("test_config_1.txt") # doctest: +ELLIPSIS
+    Kindly check width...
+    >>> configure_city_file("test_config_2.txt") # doctest: +ELLIPSIS
+    ###Kindly check the file, only numeric...
+    >>> configure_city_file("test_config_3.txt") # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    Exception: Intensity distributions should sum to 1
+    >>> configure_city_file("test_config_4.txt") # doctest: +ELLIPSIS
+    Coordinates are duplicate...
+    >>> c = configure_city_file("test_config_5.txt")
+    >>> c.coordinate_populations # doctest: +ELLIPSIS
+    [500.0, 500.0, 500.0...400.0]
     """
     city_init = 0
     try:
@@ -117,7 +131,7 @@ def configure_city_file(configuration_file: str):
                 return city_configured
     except ValueError as v:
         if re.search("int", v.__str__()):
-            print("\n###Kindly check the file, only numeric values are allowed###")
+            print("###Kindly check the file, only numeric values are allowed###")
         else:
             print(v)
     except ValidationError as v:
