@@ -1,6 +1,7 @@
 # Monte Carlo Simulation of Emergency Response for City Planning
 
 
+
 ### **Background:**
 This project is a Monte-Carlo simulation of a city with random emergency situations of different intensities that need to be attended to. The simulation takes place within a custom city with defined dimensions. The city can be configured to have emergency reponse units at different locations within the city. The objective of this simulation is to understand the optimal positioning for emergency reponse buildings such that the average response time to emergencies can be minimised. Given a configuration with locations of the emergency response unit buildings, a simulation is run randomizing the time, location, and intensity of each emergency, along with possible traffic along the route. The solution finds the average emergency response time and success rate of resolving the emergencies for the given configuration, and can be run over multiple configurations to determine which one produces the minimum response time and maximum success rate for the emergencies. This type of simulation can be useful for city planning.
 
@@ -16,6 +17,8 @@ This project is a Monte-Carlo simulation of a city with random emergency situati
 7. Probabilities of Emergency Intensities: The probabilities specifying the occurrence rate of each intensity type of emergency.
 
 
+
+
 ### **Randomized Variables:**
 1. Time of Emergency: Randomizing the occurrence of emergencies with respect to time - probability of an emergency occurring within the next minute in each zone is obtained using the poisson distribution modeled using a real dataset.
 2. Location of Emergency: Randomizing the location coordinates of the emergency within a zone using uniform distribution, as the population is assumed to be uniformly distributed within each zone.
@@ -23,9 +26,13 @@ This project is a Monte-Carlo simulation of a city with random emergency situati
 4. Traffic: A baseline time of 3 minutes is considered as the time required to travel between any two adjacent nodes/ coordinates. A PERT-based probability distribution is used to generate the percent increase penalty value beyond the baseline time, in order to account for traffic - by considering a low estimate of 0% increase, high estimate of 100% increase and average estimate being the population of the zone as a percentage of the city's population (as traffic is directly proportional to the population). The random percent increase value generated is multiplied by a deterministic time scaling factor to account for variations in traffic at the 4 different time periods of a day. This factor is then used to scale up the baseline time value.  
 
 
+
+
 ### **Output Aggregate Statistics After Each Simulation Run:**
 1) The percentage of emergencies successfully responded to: A maximum threshold response time of 10 mins is defined for an emergency response to be considered as successfully responded to.
 2) The average response time for all successfully responded emergencies
+
+
 
 
 ### **Design Entities**
@@ -88,7 +95,9 @@ An example of emergency being responded to by teams from an emergency unit using
 ![img_9.png](images/img_9.png)
 
 
-**Instructions for Code Execution:**
+
+
+### **Instructions for Code Execution:**
 1) Each run of the simulation represents a span of one day, and 100 runs of the simulation are executed.
 2) The 'configuration.txt' file in the 'config' directory has to be modified to specify the required input parameters for configuring the city and running the simulation.
 3) Once valid configuration parameters are set, execute all cells in the Jupyter Notebook 'Emergency Response Simulation Visualization'. This will read configuration parameters, display the graph of the city and the locations of the emergency units within the city, and run the simulation.
@@ -96,7 +105,9 @@ An example of emergency being responded to by teams from an emergency unit using
 
 **Hypothesis 1 and Hypothesis 2 are described in, and can be executed using their respective Jupyter Notebooks.**
 
-**References**
+
+
+### **References**
 1) https://commonslibrary.parliament.uk/research-briefings/cdp-2022-0126/ 
 2) https://www.kaggle.com/datasets/mchirico/montcoalert (Kaggle dataset from montcoalert.org)
 3) https://stackoverflow.com/questions/3160699/python-progress-bar
