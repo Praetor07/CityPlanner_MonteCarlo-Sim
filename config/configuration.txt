@@ -21,4 +21,3 @@ Width 2
 3,2
 ##Emergency rate and base population###(Space separated)
 
-

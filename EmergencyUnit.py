@@ -4,6 +4,7 @@ class EmergencyUnit:
     response_buildings = []
     wait_for_teams_to_be_available = False
     type_to_capacity_mapping = {'small': 3, 'medium': 5, 'large': 7}
+
     def __init__(self, size: str, location: tuple):
         """
         Initialize size and location of the emergency unit, along with number of teams currently available
@@ -65,7 +66,6 @@ class EmergencyUnit:
         else:
             return 0, True, team_requirement
 
-
     def check_emergency_building_coordinates(self):
         """
         Function to ensure no duplicate unit building coordinates are passed
@@ -83,7 +83,6 @@ class EmergencyUnit:
                 flag = False
                 break
         return flag
-
 
     @staticmethod
     def clear_emergency_buildings():

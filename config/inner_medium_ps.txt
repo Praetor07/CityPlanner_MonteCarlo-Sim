@@ -39,3 +39,4 @@ Width 4
 ###Large buildings(7 teams)###
 0
 ##Emergency rate and base population###(Space separated)
+203a 45
