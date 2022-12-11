@@ -214,8 +214,15 @@ class City:
         :param x: x-coordinate value
         :param y: y-coordinate value
         :return: True or False
+        >>> city = City(2, 2, [2000, 3000, 4000, 5000], [0.2, 0.2, 0.2, 0.2, 0.2])
+        >>> city.check_coordinates(-1, 0)
+        False
+        >>> city.check_coordinates(3, 3)
+        True
+        >>> city.check_coordinates(0, 6)
+        False
         """
-        if y < self.width * City.zone_dimension and x < self.height * City.zone_dimension:
+        if 0 <= y < self.width * City.zone_dimension and 0 <= x < self.height * City.zone_dimension:
             return True
         else:
             return False

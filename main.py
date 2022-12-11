@@ -125,6 +125,7 @@ def configure_city_file(configuration_file: str):
                         coordinate = f.readline().strip().split(',')
                         if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
                             print("Please enter valid coordinates according to the city configured.")
+                            raise ValueError()
                         else:
                             EmergencyUnit("small", (int(coordinate[0]), int(coordinate[1])))
                         counter += 1
@@ -136,6 +137,7 @@ def configure_city_file(configuration_file: str):
                         coordinate = f.readline().split(',')
                         if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
                             print("Please enter valid coordinates according to the city configured.")
+                            raise ValueError()
                         else:
                             EmergencyUnit("medium", (int(coordinate[0]), int(coordinate[1])))
                         counter += 1
@@ -147,6 +149,7 @@ def configure_city_file(configuration_file: str):
                         coordinate = f.readline().split(',')
                         if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
                             print("Please enter valid coordinates according to the city configured.")
+                            raise ValueError()
                         else:
                             EmergencyUnit("large", (int(coordinate[0]), int(coordinate[1])))
                         counter += 1

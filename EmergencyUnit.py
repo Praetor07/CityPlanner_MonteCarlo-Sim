@@ -49,8 +49,9 @@ class EmergencyUnit:
 
     def check_team_availability(self, team_requirement: int):
         """
-
-        :param team_requirement: attribute of the Emergency class determining the personnel needed to address the emergency
+        Function to check the availability of an emergency unit team requirements by the Emergency object
+        :param team_requirement: attribute of the Emergency class determining the number of
+         teams needed to address the emergency
         :return: further requirement, <if building can source all teams>, dispatched teams from unit
 
         >>> e= EmergencyUnit('medium', (1,1))
@@ -86,6 +87,10 @@ class EmergencyUnit:
 
     @staticmethod
     def clear_emergency_buildings():
+        """
+        Function to reset all variables to default (empty) value before next run of the simulation
+        :return: None
+        """
         EmergencyUnit.wait_for_teams_to_be_available = False
         EmergencyUnit.response_buildings = []
 
