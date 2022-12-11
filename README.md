@@ -5,11 +5,6 @@
 This project is a Monte-Carlo simulation of a city with random emergency situations of different intensities that need to be attended to. The simulation takes place within a custom city with defined dimensions. The city can be configured to have emergency reponse units at different locations within the city. The objective of this simulation is to understand the optimal positioning for emergency reponse buildings such that the average response time to emergencies can be minimised. Given a configuration with locations of the emergency response unit buildings, a simulation is run randomizing the time, location, and intensity of each emergency, along with possible traffic along the route. The solution finds the average emergency response time and success rate of resolving the emergencies for the given configuration, and can be run over multiple configurations to determine which one produces the minimum response time and maximum success rate for the emergencies. This type of simulation can be useful for city planning.
 
 
-### **Design Assumptions:**
-
-**Emergencies and Emergency Response Units:**
-
-
 
 ### **Configurable Parameters of Simulation:**
 1. Zone Count and Arrangement: The number of zones in the city must be specified along with the width and height of the city in terms of the number of zones.
