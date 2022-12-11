@@ -103,9 +103,9 @@ An example of emergency being responded to by teams from an emergency unit using
 3) Once valid configuration parameters are set, execute all cells in the Jupyter Notebook 'Emergency Response Simulation Visualization'. This will read configuration parameters, display the graph of the city and the locations of the emergency units within the city, and run the simulation.
 4) Then, output statistics obtained from each simulation run are aggregated and plotted, through which convergence of the statistics can be visualized.
 
-### **Hypothesis 1 and Hypothesis 2 are described in, and can be executed using their respective Jupyter Notebooks.**
+### **Hypothesis 1 and Hypothesis 2 are described in, and can be executed using their respective Jupyter Notebooks. It is advised to execute the cells in order, as the city lifecycle of configuration, execution and resetting are performed sequentially along the cells.**
 
-
+### Note: The analysis and conclusions obtained from the hypotheses are aimed at suggesting optimal patterns of positioning and distribution of emergency units across the city and not meant to be indicative of specific or precise positioning and distribution configurations. Since the aim was to perform relative comparison between the emergency response metrics of the multiple configurations and not to state absolute city configuration solutions or statistics, approximate cost values for small, medium and large unit buildings were considered in Hypothesis 2 and approximate even distribution of units across the city was done.
 
 
 ### Appendix
