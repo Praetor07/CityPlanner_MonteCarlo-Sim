@@ -7,20 +7,8 @@ This project is a Monte-Carlo simulation of a city with random emergency situati
 
 ### **Design Assumptions:**
 
-**City:**
-1. A city is constructed using a set of coordinates
-2. A coordinate represents the area around its vicinity, not a single point in the city.
-3. Each City is divided into zones with equal areas, with three being a default of 9 coordinates per zone
-4. Every zone can have a different population which will be uniformly distributed within a zone
-5. There is a path between all horizontally & vertically adjacent coordinates with a default commute time of 3 minutes 
-
 **Emergencies and Emergency Response Units:**
-1. We have defined three types of emergency response unit buildings: Large with 7 emergency response teams, Medium with 5 emergency response teams and Small with 3    emergency response team. 
-3. Default Base Emergency Rate for a city is set to be 13 emergencies per minute for a population of 200k, which is scaled according to the population of the          configured city and zones
-4. Emergencies can be of 5 intensities with the below resolution time and personnel requirements
-![image](https://user-images.githubusercontent.com/47455312/206881503-28ffcd49-657f-4510-ae8e-73c869fc54a6.png)
-5. Emergencies and Emergency Response units are both located on coordinates. Given that a coordinate represents an area and not a single point within the city, it      is permissible to have an emergency to be resolved as an emergency response unit located at the same coordinate
-(Please refer appendix for the justification behind assumptions)
+
 
 
 ### **Configurable Parameters of Simulation:**
@@ -47,33 +35,33 @@ This project is a Monte-Carlo simulation of a city with random emergency situati
 
 ### **Design Entities**
 
-1) City Configuration
+**1) City Configuration**
 
 Assumptions: 
-- Within each zone, the population is uniformly distributed.
-- Each City is divided into zones with equal areas
-- Every zone can have a different population which will be uniformly distributed within a zone
-- There is a path between all horizontally & vertically adjacent coordinates
-- A coordinate represents the area around its vicinity, not a single point in the city. 
-- Emergencies will occur at a coordinate
-- Emergency Units are also located at the specified coordinates
-- Hence, an emergency can occur on a coordinate that houses an Emergency Response Unit
+1. A city is constructed using a set of coordinates
+2. A coordinate represents the area around its vicinity, not a single point in the city.
+3. Each City is divided into zones with equal areas, with three being a default of 9 coordinates per zone
+4. Every zone can have a different population which will be uniformly distributed within a zone
+5. There is a path between all horizontally & vertically adjacent coordinates with a default commute time of 3 minutes 
+(Please refer appendix for the justification behind assumptions)
 
 
 Configurable Parameters:
-- Height of the city (in terms of zones)
-- Width of the city (in terms of zones)
-- Population of each zone
+1. Height of the city (in terms of zones)
+2. Width of the city (in terms of zones)
+3. Population of each zone
 
 Each zone in a city represents a 3X3 square grid. The diagram below shows an example city configured with a width and height of 4 zones.
 ![img_2.png](images/img_2.png)
 
 
-2) Emergency Units
+**2) Emergency Units**
 
 Assumptions:
-- Emergencies are resolved using available teams from one or more emergency unit buildings.
-- Teams in the emergency units are not available when responding to an emergency but commuting to the location of the emergency, resolving an emergency, and commuting back to their base location.
+1. Emergencies are resolved using available teams from one or more emergency unit buildings.
+2. We have defined three types of emergency response unit buildings: Large with 7 emergency response teams, Medium with 5 emergency response teams and Small with 3    emergency response team. 
+3. Teams in the emergency units are not available when responding to an emergency but commuting to the location of the emergency, resolving an emergency, and          commuting back to their base location.
+(Please refer appendix for the justification behind assumptions)
 
 Configurable Parameters:
 - Number of Small, Medium and Large Emergency Units
@@ -83,10 +71,14 @@ An example of small, medium and large emergency units positioned across the city
 ![img_3.png](images/img_3.png)
 ![img_4.png](images/img_4.png)
 
-3) Emergency
 
-Assumptions:
-![img_5.png](images/img_5.png)
+**3) Emergency**
+
+3. Default Base Emergency Rate for a city is set to be 13 emergencies per minute for a population of 200k, which is scaled according to the population of the          configured city and zones
+4. Emergencies can be of 5 intensities with the below resolution time and personnel requirements
+![image](https://user-images.githubusercontent.com/47455312/206881503-28ffcd49-657f-4510-ae8e-73c869fc54a6.png)
+5. Emergencies and Emergency Response units are both located on coordinates. Given that a coordinate represents an area and not a single point within the city, it      is permissible to have an emergency to be resolved as an emergency response unit located at the same coordinate
+(Please refer appendix for the justification behind assumptions)
 
 Configurable Parameters:
 - Probability of occurrence of each emergency intensity
@@ -99,6 +91,7 @@ Flow of emergency resolution:
 
 An example of emergency being responded to by teams from an emergency unit using the optimal path:
 ![img_9.png](images/img_9.png)
+
 
 **Instructions for Code Execution:**
 1) Each run of the simulation represents a span of one day, and 100 runs of the simulation are executed.
