@@ -8,8 +8,8 @@ This project is a Monte-Carlo simulation of a city with random emergency situati
 
 
 ### **Configurable Parameters of Simulation:**
-1. Zone Count and Arrangement: The number of zones in the city must be specified along with the width and height of the city in terms of the number of zones.
-2. Population of Each Zone: The number of people residing in each zone must be specified. Each zone can have a different head count.
+1. Zone Count and Arrangement: The number of zones in the city must be specified in the form of the width and height of the city in terms of the number of zones.
+2. Population of Each Zone: The number of people residing in each zone must be specified. Each zone can have a different population.
 3. Total Number of Large Emergency Response Unit Buildings: The number of emergency response unit buildings (each having 7 emergency response teams) that can be        constructed in the city.
 4. Total Number of Medium Emergency Response Unit Buildings: The number of emergency response unit buildings (each having 5 emergency response teams) that can be      constructed in the city.
 5. Total Number of Small Emergency Response Unit Buildings: The number of emergency response unit buildings (each having 3 emergency response team) that can be        constructed in the city.
@@ -20,16 +20,16 @@ This project is a Monte-Carlo simulation of a city with random emergency situati
 
 
 ### **Randomized Variables:**
-1. Time of Emergency: Randomizing the occurrence of emergencies with respect to time - probability of an emergency occurring within the next minute in each zone is obtained using the poisson distribution modeled using a real dataset.
-2. Location of Emergency: Randomizing the location coordinates of the emergency within a zone using uniform distribution, as the population is assumed to be uniformly distributed within each zone.
+1. Time of Emergency: Randomizing the occurrence of emergencies with respect to time - probability of an emergency occurring within the next minute in each zone is obtained using the poisson distribution modeled using a real dataset. The rate of occurrence used to model the poisson distribution can also be provided as user input.
+2. Location of Emergency: Randomizing the location coordinates of the emergency within a zone using a uniform distribution, as the population is assumed to be uniformly distributed within each zone.
 3. Intensity of Emergency: Each emergency can have an intensity which is measured on a scale of 1 to 5, with 1 being the lowest intensity and 5 being the highest intensity. The number of emergency teams and the time taken to resolve the emergency will be a deterministic function of the intensity of the emergency. The intensity of the emergency will be randomized on the discrete scale mentioned above. Probabilities of each intensity will be taken as user input, as intensity of emergencies occurring in a city are highly dependent on the city itself.
-4. Traffic: A baseline time of 3 minutes is considered as the time required to travel between any two adjacent nodes/ coordinates. A PERT-based probability distribution is used to generate the percent increase penalty value beyond the baseline time, in order to account for traffic - by considering a low estimate of 0% increase, high estimate of 100% increase and average estimate being the population of the zone as a percentage of the city's population (as traffic is directly proportional to the population). The random percent increase value generated is multiplied by a deterministic time scaling factor to account for variations in traffic at the 4 different time periods of a day. This factor is then used to scale up the baseline time value.  
+4. Traffic: A baseline time of 3 minutes is considered as the time required to travel between any two adjacent nodes/ coordinates. A PERT-based probability distribution is used to generate the percent increase penalty value beyond the baseline time, in order to account for traffic - by considering a low estimate of 0% increase, high estimate of 100% increase and average estimate being the population of the zone as a percentage of the city's population (as traffic is directly proportional to the population). The random percent increase value generated is multiplied by a deterministic time scaling factor to account for variations in traffic at 4 different time periods of a day. This factor is then used to scale up the baseline time value.  
 
 
 
 
 ### **Output Aggregate Statistics After Each Simulation Run:**
-1) The percentage of emergencies successfully responded to: A maximum threshold response time of 10 mins is defined for an emergency response to be considered as successfully responded to.
+1) The percentage of emergencies successfully responded to: A maximum threshold response time of 10 minutes is defined for an emergency response to be considered as successfully responded to.
 2) The average response time for all successfully responded emergencies
 
 
@@ -42,7 +42,7 @@ This project is a Monte-Carlo simulation of a city with random emergency situati
 Assumptions: 
 1. A city is constructed using a set of coordinates
 2. A coordinate represents the area around its vicinity, not a single point in the city.
-3. Each City is divided into zones with equal areas, with three being a default of 9 coordinates per zone
+3. Each city is divided into zones with equal areas, with three being a default of 9 coordinates per zone
 4. Every zone can have a different population which will be uniformly distributed within a zone
 5. There is a path between all horizontally & vertically adjacent coordinates with a default commute time of 3 minutes 
 (Please refer appendix for the justification behind assumptions)
@@ -76,7 +76,7 @@ An example of small, medium and large emergency units positioned across the city
 
 **3) Emergency**
 
-3. Default Base Emergency Rate for a city is set to be 13 emergencies per minute for a population of 200k, which is scaled according to the population of the          configured city and zones
+3. Default Base Emergency Rate for a city is set to be 13.1615 emergencies per minute for a population of 200k, which is scaled according to the population of the          configured city and zones
 4. Emergencies can be of 5 intensities with the below resolution time and personnel requirements
 ![image](https://user-images.githubusercontent.com/47455312/206881503-28ffcd49-657f-4510-ae8e-73c869fc54a6.png)
 5. Emergencies and Emergency Response units are both located on coordinates. Given that a coordinate represents an area and not a single point within the city, it      is permissible to have an emergency to be resolved as an emergency response unit located at the same coordinate. The commute time in such cases is assumed to a      minimal value of 1 minute
@@ -103,7 +103,7 @@ An example of emergency being responded to by teams from an emergency unit using
 3) Once valid configuration parameters are set, execute all cells in the Jupyter Notebook 'Emergency Response Simulation Visualization'. This will read configuration parameters, display the graph of the city and the locations of the emergency units within the city, and run the simulation.
 4) Then, output statistics obtained from each simulation run are aggregated and plotted, through which convergence of the statistics can be visualized.
 
-**Hypothesis 1 and Hypothesis 2 are described in, and can be executed using their respective Jupyter Notebooks.**
+### **Hypothesis 1 and Hypothesis 2 are described in, and can be executed using their respective Jupyter Notebooks.**
 
 
 
