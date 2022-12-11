@@ -4,6 +4,7 @@
 ### **Background:**
 This project is a Monte-Carlo simulation of a city with random emergency situations of different intensities that need to be attended to. The simulation takes place within a custom city with defined dimensions. The city can be configured to have emergency reponse units at different locations within the city. The objective of this simulation is to understand the optimal positioning for emergency reponse buildings such that the average response time to emergencies can be minimised. Given a configuration with locations of the emergency response unit buildings, a simulation is run randomizing the time, location, and intensity of each emergency, along with possible traffic along the route. The solution finds the average emergency response time and success rate of resolving the emergencies for the given configuration, and can be run over multiple configurations to determine which one produces the minimum response time and maximum success rate for the emergencies. This type of simulation can be useful for city planning.
 
+
 ### **Design Assumptions:**
 
 **City:**
@@ -21,6 +22,7 @@ This project is a Monte-Carlo simulation of a city with random emergency situati
 5. Emergencies and Emergency Response units are both located on coordinates. Given that a coordinate represents an area and not a single point within the city, it      is permissible to have an emergency to be resolved as an emergency response unit located at the same coordinate
 (Please refer appendix for the justification behind assumptions)
 
+
 ### **Configurable Parameters of Simulation:**
 1. Zone Count and Arrangement: The number of zones in the city must be specified along with the width and height of the city in terms of the number of zones.
 2. Population of Each Zone: The number of people residing in each zone must be specified. Each zone can have a different head count.
@@ -31,18 +33,19 @@ This project is a Monte-Carlo simulation of a city with random emergency situati
 7. Probabilities of Emergency Intensities: The probabilities specifying the occurrence rate of each intensity type of emergency.
 
 
-**Randomized Variables:**
-1) Time of Emergency: Randomizing the occurrence of emergencies with respect to time - probability of an emergency occurring within the next minute in each zone is obtained using the poisson distribution modeled using a real dataset.
-2) Location of Emergency: Randomizing the location coordinates of the emergency within a zone using uniform distribution, as the population is assumed to be uniformly distributed within each zone.
-3) Intensity of Emergency: Each emergency can have an intensity which is measured on a scale of 1 to 5, with 1 being the lowest intensity and 5 being the highest intensity. The number of emergency teams and the time taken to resolve the emergency will be a deterministic function of the intensity of the emergency. The intensity of the emergency will be randomized on the discrete scale mentioned above. Probabilities of each intensity will be taken as user input, as intensity of emergencies occurring in a city are highly dependent on the city itself.
-4) Traffic: A baseline time of 3 minutes is considered as the time required to travel between any two adjacent nodes/ coordinates. A PERT-based probability distribution is used to generate the percent increase penalty value beyond the baseline time, in order to account for traffic - by considering a low estimate of 0% increase, high estimate of 100% increase and average estimate being the population of the zone as a percentage of the city's population (as traffic is directly proportional to the population). The random percent increase value generated is multiplied by a deterministic time scaling factor to account for variations in traffic at the 4 different time periods of a day. This factor is then used to scale up the baseline time value.  
+### **Randomized Variables:**
+1. Time of Emergency: Randomizing the occurrence of emergencies with respect to time - probability of an emergency occurring within the next minute in each zone is obtained using the poisson distribution modeled using a real dataset.
+2. Location of Emergency: Randomizing the location coordinates of the emergency within a zone using uniform distribution, as the population is assumed to be uniformly distributed within each zone.
+3. Intensity of Emergency: Each emergency can have an intensity which is measured on a scale of 1 to 5, with 1 being the lowest intensity and 5 being the highest intensity. The number of emergency teams and the time taken to resolve the emergency will be a deterministic function of the intensity of the emergency. The intensity of the emergency will be randomized on the discrete scale mentioned above. Probabilities of each intensity will be taken as user input, as intensity of emergencies occurring in a city are highly dependent on the city itself.
+4. Traffic: A baseline time of 3 minutes is considered as the time required to travel between any two adjacent nodes/ coordinates. A PERT-based probability distribution is used to generate the percent increase penalty value beyond the baseline time, in order to account for traffic - by considering a low estimate of 0% increase, high estimate of 100% increase and average estimate being the population of the zone as a percentage of the city's population (as traffic is directly proportional to the population). The random percent increase value generated is multiplied by a deterministic time scaling factor to account for variations in traffic at the 4 different time periods of a day. This factor is then used to scale up the baseline time value.  
 
 
-**Output Aggregate Statistics After Each Simulation Run:**
-1) The percentage of emergencies successfully responded to: A maximum threshold response time of 10 mins is defined - for an emergency response to be considered as successfully responded to.
+### **Output Aggregate Statistics After Each Simulation Run:**
+1) The percentage of emergencies successfully responded to: A maximum threshold response time of 10 mins is defined for an emergency response to be considered as successfully responded to.
 2) The average response time for all successfully responded emergencies
 
-**Design Entities**
+
+### **Design Entities**
 
 1) City Configuration
 
