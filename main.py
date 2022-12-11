@@ -34,11 +34,14 @@ def poisson_probability(rates: np.array) -> np.array:
     >>> res = poisson_probability(np.asarray([0.0256, 0.349, 0.00127]))
     >>> [round(p, 5) for p in res]
     [0.02528, 0.29461, 0.00127]
+    >>> poisson_probability(np.asarray(['hello', 0.349, 0.00127]))
+    Traceback (most recent call last):
+    ValueError: Rates cannot be converted to poisson probabilities
     """
     if rates.dtype == np.float64:
         return 1 - np.exp(-1*rates)
     else:
-        raise ValueError("Rates cannot be converted to poisson probabilities ")
+        raise ValueError("Rates cannot be converted to poisson probabilities")
 
 
 def configure_city_file(configuration_file: str):
@@ -158,10 +161,29 @@ def simulate(test_city):
     :return: List of average responses times aggregated after each simulation run, list of percentage of successfully
     responded emergencies aggregated after each simulation run, total number of emergencies that occurred in the
     entire duration of the simulations, dictionary of details of first 3 emergencies used for visualizations.
+    >>> populations = [2500, 2500]
+    >>> intensity_distributions = [1, 0, 0, 0, 0]
+    >>> test = City(2, 1, populations, intensity_distributions)
+    >>> EmergencyUnit.clear_emergency_buildings()
+    >>> Emergency.clear_emergencies()
+    >>> e1 = EmergencyUnit('small', (1, 1))
+    >>> e2 = EmergencyUnit('small', (1, 3))
+    >>> e3 = EmergencyUnit('small', (1, 5))
+    >>> e4 = EmergencyUnit('small', (0, 2))
+    >>> e5 = EmergencyUnit('small', (0, 4))
+    >>> e6 = EmergencyUnit('small', (2, 0))
+    >>> e7 = EmergencyUnit('small', (2, 2))
+    >>> e8 = EmergencyUnit('small', (2, 4))
+    >>> e9 = EmergencyUnit('small', (0, 0))
+    >>> resp_time, perc, num_emer, emer_dict = simulate(test)
+    >>> 1.0 <= resp_time[-1] <= 3.0
+    True
+    >>> 90 <= perc[-1]
+    True
     """
     thread_list = []
     seconds_in_a_day = 1440
-    base_rate_for_emergency = 1.3165119
+    base_rate_for_emergency = 13.165119
     base_population = 200000
     number_of_emergencies = 0
     aggregate_resp_times = []

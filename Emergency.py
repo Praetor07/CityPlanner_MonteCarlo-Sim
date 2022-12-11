@@ -33,10 +33,10 @@ class Emergency:
         >>> populations = [2000, 3500, 900, 4500, 700, 9000, 870, 4500, 2000, 400, 2400, 3000]
         >>> intensity_distributions = [0.2, 0.2, 0.2, 0.2, 0.2]
         >>> test1 = City(4, 3, populations, intensity_distributions)
-        >>> e1 = EmergencyUnit('large', (1, 7))
-        >>> e2 = EmergencyUnit('large', (3, 2))
-        >>> e3 = EmergencyUnit('large', (5, 0))
-        >>> e4 = EmergencyUnit('large', (7, 10))
+        >>> EmergencyUnit('large', (1, 7))
+        >>> EmergencyUnit('large', (3, 2))
+        >>> EmergencyUnit('large', (5, 0))
+        >>> EmergencyUnit('large', (7, 10))
         >>> e1=Emergency(test1, 8)
         >>> 6 <= e1.location[0] <= 8
         True
@@ -64,9 +64,11 @@ class Emergency:
         zone_col = zone % city.width
         zone_row = math.floor(zone/city.width)
         self.response_unit = None
+        # One of 9 coordinates (0 to 8) chosen to position emergency
         loc = random.randint(0, (City.zone_dimension ** 2) - 1)
         r = math.floor(loc/City.zone_dimension)
         c = loc % City.zone_dimension
+        # Location of the emergency calculated with respect to the city coordinate grid
         self.location = ((zone_row*City.zone_dimension) + r, (zone_col*City.zone_dimension) + c)
         rand = random.randint(1, 100)
         for i in range(len(city.intensity_cumulative)):
@@ -117,13 +119,20 @@ class Emergency:
         True
         """
         emergency_units, time_taken_to_reach, waiting_time = self.allocate_teams_to_emergency()
+        # Total time taken to resolve emergency
         time_to_resolve = time_taken_to_reach + Emergency.intensity_mapping[self.intensity]['time'] + \
-                          time_taken_to_reach + waiting_time
+            time_taken_to_reach + waiting_time
+        # Time taken to respond to the emergency (commute time to location of emergency)
         self.time_to_respond = float(time_taken_to_reach) + waiting_time
         self.response_unit = emergency_units
+        # Waiting for passage of time equivalent to the total time that teams are busy (to-commute time, time to resolve
+        # emergency, fro-commute time and any waiting time), by simulating each minute as program equivalent of passage
+        # of a minute as what occurs in the simulate() function, where each iteration and the computation within each
+        # iteration until a random number is chosen is considered to be 1 minute in program/simulation time
         for _ in range(int(time_to_resolve)):
             for __ in self.city_of_emergency.zone_populations:
                 random.randint(1, 1000000)
+        # Relieve emergency teams after keeping them busy for the required duration of time as described above
         for emergency_unit, num_teams in emergency_units.items():
             emergency_unit.relieve_response_teams(num_teams)
 
@@ -184,10 +193,16 @@ class Emergency:
         with Emergency.lock:
             graph = self.city_of_emergency.city_graph
             emergency_requirement = self.requirement
-            response_time = 0  # seconds
+            # Response time measured in minutes
+            response_time = 0
             winner_nodes = defaultdict(dict)
             while emergency_requirement != 0:
                 node_to_emergency_details = defaultdict(dict)
+                # For units where teams are available, sort the units by time required for a team from unit
+                # to reach location of emergency (ascending order), and use number of
+                # available teams (descending order) to resolve ties while sorting. If an emergency occurs
+                # at the same location as an emergency unit, minimal default time of 1 minute is considered
+                # as the time taken to respond to the emergency.
                 for unit in EmergencyUnit.response_buildings:
                     if unit.available_capacity > 0:
                         node_to_emergency_details[unit]['capacity'] = unit.available_capacity
@@ -206,6 +221,12 @@ class Emergency:
                         winner_nodes[response_unit] = teams_dispatched
                     if emergency_requirement == 0:
                         break
+                # If there aren't sufficient teams available to resolve the emergency, wait until a team becomes
+                # available (appropriate flag is set by thread in EmergencyUnit class when relieving teams).
+                # Record the waiting time in minutes, by simulating each minute as program equivalent of passage
+                # of a minute as what occurs in the simulate() function, where each iteration and the computation
+                # within each iteration until a random number is chosen is considered to be 1 minute in
+                # program/simulation time
                 if emergency_requirement != 0:
                     EmergencyUnit.wait_for_teams_to_be_available = True
                     while EmergencyUnit.wait_for_teams_to_be_available:
@@ -214,7 +235,6 @@ class Emergency:
                         waiting_time += 1
                 else:
                     avg_resp = response_time / len(winner_nodes)
-            # winner_criteria = 1 if avg_resp >= 15 else 0
             return winner_nodes, avg_resp, waiting_time
 
     @staticmethod

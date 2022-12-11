@@ -1,6 +1,7 @@
 import numpy as np
 import networkx as nx
 
+
 # Function for mod_pert_random has been picked from Mr Weible's example
 # from https://github.com/iSchool-597PR/2022_Fall_examples/blob/main/unit_07/Probability_Distributions.ipynb
 def mod_pert_random(low, likely, high, confidence=4, samples=1):
@@ -13,6 +14,7 @@ def mod_pert_random(low, likely, high, confidence=4, samples=1):
                         4 here matches the standard PERT curve. Higher
                         values indicate higher confidence in the mode.
                         Currently allows values 1-18
+    :param samples: The number of values to be sampled from the PERT distribution
     Formulas to convert beta to PERT are adapted from a whitepaper
     "Modified Pert Simulation" by Paulo Buchsbaum.
     """
@@ -31,6 +33,9 @@ def mod_pert_random(low, likely, high, confidence=4, samples=1):
 
 
 class City:
+    """
+    City entity which represented the configured city.
+    """
     zone_dimension = 3
     traffic_time_weights = {0: 0, 1: 2, 2: 2, 3: 1}
     default_commute_time = 3
@@ -60,19 +65,6 @@ class City:
         self.build_city_graph()
         self.likely_vals = self.zone_populations / np.sum(self.zone_populations)
         self.update_graph_edges(0)
-        # 0,0   0,1   0,2   0,3   0,4   0,5     0,6     0,7     0,8     0,9     0,10    0,11
-        # 1,0   1,1   1,2   1,3   1,4   1,5     1,6     1,7     1,8     1,9     1,10    1,11
-        # 2,0   2,1   2,2   2,3   2,4   2,5     2,6     2,7     2,8     2,9     2,10    2,11
-        # 3,0   3,1   3,2   3,3   3,4   3,5     3,6     3,7     3,8     3,9     3,10    3,11
-        # 4,0   4,1   4,2   4,3   4,4   4,5     4,6     4,7     4,8     4,9     4,10    4,11
-        # 5,0   5,1   5,2   5,3   5,4   5,5     5,6     5,7     5,8     5,9     5,10    5,11
-        # 6,0   6,1   6,2   6,3   6,4   6,5     6,6     6,7     6,8     6,9     6,10    6,11
-        # 7,0   7,1   7,2   7,3   7,4   7,5     7,6     7,7     7,8     7,9     7,10    7,11
-        # 8,0   8,1   8,2   8,3   8,4   8,5     8,6     8,7     8,8     8,9     8,10    8,11
-        # 9,0   9,1   9,2   9,3   9,4   9,5     9,6     9,7     9,8     9,9     9,10    9,11
-        # 10,0   10,1   8,2   8,3   8,4   8,5     8,6     8,7     8,8     0,9     0,10    8,11
-        # 11,0   11,1   11,2   11,3   11,4   11,5     11,6     11,7     1,8     0,9     0,10    8,11
-
 
     def get_commute_time(self, source_node: tuple, dest_node: tuple, time_weight: int):
         """
@@ -96,7 +88,8 @@ class City:
         Exception: Invalid Source or Destination Node.
         """
         if self.city_graph.has_edge(source_node, dest_node):
-            likely = 0.5 * (self.likely_vals[self.city_graph.nodes[source_node]['Zone_Number']] + self.likely_vals[self.city_graph.nodes[dest_node]['Zone_Number']])
+            likely = 0.5 * (self.likely_vals[self.city_graph.nodes[source_node]['Zone_Number']] +
+                            self.likely_vals[self.city_graph.nodes[dest_node]['Zone_Number']])
             traffic_time = mod_pert_random(low=0, likely=likely, high=1, samples=1)
             traffic_time *= time_weight
             commute_time = City.default_commute_time + City.default_commute_time * traffic_time
@@ -152,7 +145,8 @@ class City:
                 self.city_graph.add_nodes_from([((i, j), {'Zone_Number': zone_num,
                                                           'Zone_Population': self.zone_populations[zone_num],
                                                           'Coord_Population': self.zone_populations[
-                                                                                  zone_num] / City.zone_dimension ** 2})])
+                                                                                  zone_num] / City.zone_dimension ** 2})
+                                                ])
             if (i == 0) or (i % City.zone_dimension != 0):
                 zone_num -= self.width
 
