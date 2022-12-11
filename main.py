@@ -24,7 +24,7 @@ class ValidationError(Exception):
         if self.flag == "rate":
             return f"Didn't receive either rate or base population. Running the simulation using " \
                    f" default values of rate and population"
-        return f"Kindly check {self.flag}, its passed as {self.x}. This isn't correct. It should be greater than 0"
+        return f"Kindly check {self.flag}, it's passed as {self.x}. This isn't correct. It should be greater than 0"
 
 
 def poisson_probability(rates: np.array) -> np.array:
@@ -65,9 +65,7 @@ def configure_city_file(configuration_file: str):
     >>> configure_city_file("test_config_2.txt") # doctest: +ELLIPSIS
     ###Kindly check the configuration file...
     >>> configure_city_file("test_config_3.txt") # doctest: +ELLIPSIS
-    Traceback (most recent call last):
-    ...
-    Exception: Intensity distributions should sum to 1
+    Intensity distributions should sum to 1...
     >>> configure_city_file("test_config_4.txt") # doctest: +ELLIPSIS
     Coordinates are duplicate...
     >>> c = configure_city_file("test_config_5.txt")
@@ -113,7 +111,10 @@ def configure_city_file(configuration_file: str):
                     intensity = f.readline()
                     intensity_distributions = np.asarray([float(i) for i in intensity.split(' ')])
                     if intensity_distributions.sum() != 1:
-                        raise Exception("Intensity distributions should sum to 1")
+                        raise ValueError("Intensity distributions should sum to 1")
+                    elif len(intensity_distributions) != 5:
+                        print("Please specify intensity probabilities for all 5 types of intensities")
+                        raise ValueError("Please specify intensity probabilities for all 5 types of intensities")
                 if city_init == 3:
                     city_configured = City(width, height, populations_list, intensity_distributions)
                 if re.search('small building', present_line, re.IGNORECASE):
