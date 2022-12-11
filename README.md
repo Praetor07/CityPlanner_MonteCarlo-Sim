@@ -117,7 +117,10 @@ The base rate of emergency for a city was arrived at based on 911 emergency call
 Based on a research conducted in the UK, the criteria for responding to emergencies was found to be 7 minutes on an average, with 90% emergencies being responded to within 10 minutes. We used this as a baseline in designing our city and configuring the parameters. Hence, the response time threshold was set to be 10 minutes
 
 **Number of Teams in Small, Medium and Large Emergency Unit Building**
-Based on real world data we know that a city of size 200k population has ~13 emergencies per minute. Hence we were able to estimate the #emergencies that would occur in our custom city given a certain population. We also know based on real world data that 90% of emergencies need to be responded to within 15 minutes, hence our threshold of 10 minutes From an implementation point of view, even if we say that 20% of the nodes can have an emergency unit, we would need x buildings. No of teams per building were chosen by experimentation so that we are able to meet all the other criteria that we were able find real world data for
+Based on real world data we know that a city of size 200k population has ~13 emergencies per minute. Hence we were able to estimate the #emergencies that would occur in our custom city given a certain population. We also know based on real world data that 90% of emergencies need to be responded to within 15 minutes, hence our threshold of 10 minutes From an implementation point of view, even if we say that 10% of the nodes can have an emergency unit, the teams allocated to each building must be such that the simulation results in an average value of emergency resolution around 7 minutes. Given that we ran experiments with city having 4x4 zones with 9 coordinates in each zone, the number of teams per building were chosen by experimentation so that we are able to meet these criteria so that the simulation is as close to real world as possible
+
+
+
 
 
 ### **References**
