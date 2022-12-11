@@ -21,6 +21,9 @@ class ValidationError(Exception):
         self.flag = flag
 
     def __str__(self):
+        if self.flag == "rate":
+            return f"Didnt received either rate or base population.Taking default values for rate and population and " \
+                   f"running "
         return f"Kindly check {self.flag}, its passed as {self.x}. This isnt correct. It should be greater than 0"
 
 
@@ -50,6 +53,8 @@ def configure_city_file(configuration_file: str):
     Only numeric values should be passed
     Population should be greater than 0
     Intensity distributions should sum up to 1
+    Unit coordinates should be the same as initial number passed
+    If no rate/base population passed, run with default config
     :return:
 
     >>> configure_city_file("test_config_1.txt") # doctest: +ELLIPSIS
@@ -67,11 +72,13 @@ def configure_city_file(configuration_file: str):
     [500.0, 500.0, 500.0...400.0]
     """
     city_init = 0
+    building_flag = ''
     try:
         with open(f"./config/{configuration_file}", 'r') as f:
             present_line = f.readline()
             while present_line:
                 if re.search('dimension', present_line, re.IGNORECASE):
+                    building_flag = ''
                     counter = 0
                     city_init += 1
                     while counter < 2:
@@ -85,7 +92,8 @@ def configure_city_file(configuration_file: str):
                             if width <= 0:
                                 raise ValidationError(width, "width")
                         counter += 1
-                if re.search('population', present_line, re.IGNORECASE):
+                if re.search('population distribution', present_line, re.IGNORECASE):
+                    building_flag = ''
                     city_init += 1
                     populations_list = np.empty(width * height)
                     counter = 0
@@ -96,6 +104,7 @@ def configure_city_file(configuration_file: str):
                         populations_list[counter] = population
                         counter += 1
                 if re.search('intensity', present_line, re.IGNORECASE):
+                    building_flag = ''
                     city_init += 1
                     intensity = f.readline()
                     intensity_distributions = np.asarray([float(i) for i in intensity.split(' ')])
@@ -104,6 +113,7 @@ def configure_city_file(configuration_file: str):
                 if city_init == 3:
                     city_configured = City(width, height, populations_list, intensity_distributions)
                 if re.search('small building', present_line, re.IGNORECASE):
+                    building_flag = "small"
                     count_of_small_buildings = int(f.readline().split()[0])
                     counter = 0
                     while counter < count_of_small_buildings:
@@ -114,6 +124,7 @@ def configure_city_file(configuration_file: str):
                             EmergencyUnit("small", (int(coordinate[0]), int(coordinate[1])))
                         counter += 1
                 if re.search('medium building', present_line, re.IGNORECASE):
+                    building_flag = "medium"
                     count_of_medium_buildings = int(f.readline().strip().split()[0])
                     counter = 0
                     while counter < count_of_medium_buildings:
@@ -124,27 +135,42 @@ def configure_city_file(configuration_file: str):
                             EmergencyUnit("medium", (int(coordinate[0]), int(coordinate[1])))
                         counter += 1
                 if re.search('large building', present_line, re.IGNORECASE):
+                    building_flag = "large"
                     count_of_large_buildings = int(f.readline().strip().split()[0])
                     counter = 0
                     while counter < count_of_large_buildings:
+                        print("in here")
                         coordinate = f.readline().split(',')
                         if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
                             print("Please enter valid coordinates according to the city configured.")
                         else:
                             EmergencyUnit("large", (int(coordinate[0]), int(coordinate[1])))
                         counter += 1
+                if re.search('emergency rate', present_line, re.IGNORECASE):
+                    building_flag = ''
+                    temp_list = f.readline().split(' ')
+                    if len(temp_list) == 1:
+                        raise ValidationError(0, "rate")
+                    configured_base_emergency_rate = temp_list[0]
+                    configured_population = temp_list[1]
                 present_line = f.readline()
-            return city_configured
+            return city_configured, float(configured_base_emergency_rate), int(configured_population)
     except ValueError as v:
-        if re.search("int", v.__str__()):
+        if re.search("int|float", v.__str__()):
+            if building_flag in ["small", "medium", "large"]:
+                print(f"{building_flag} buildings has an issue.Possibly number of buildings != number of coordinates "
+                      f"entered")
             print("###Kindly check the file, only numeric values are allowed###")
         else:
             print(v)
     except ValidationError as v:
         print(v)
+        if re.search("rate", v.__str__(), re.IGNORECASE):
+            return city_configured, None, None
+    return None, None, None
 
 
-def simulate(test_city):
+def simulate(test_city, base_rate_for_emergency: float, base_population: int):
     """
     Performs a Monte-Carlo simulation with 100 runs and each run representing a span of 1 day, of emergencies occurring
     at randomized time and locations within the city, with randomly chosen intensities in the scale of 1 to 5.
@@ -155,21 +181,25 @@ def simulate(test_city):
 
     :param test_city: The CityConfiguration object representing the city configured in the simulation - with a
     defined width, height, population of each zone, and emergency units at specific locations.
+    :param base_rate_for_emergency: Emergency rate per unit minute as configured in the input file. If no input is given in
+    the input file then the default value is considered as calculated from the Montgomery PA data
+    :param base_population: Base population as given in the configuration file, if the value isnt given then the default
+    value is considered as calculated from the Montgomery PA data
     :return: List of average responses times aggregated after each simulation run, list of percentage of successfully
     responded emergencies aggregated after each simulation run, total number of emergencies that occurred in the
     entire duration of the simulations, dictionary of details of first 3 emergencies used for visualizations.
     """
+    base_rate_for_emergency = 13.165119 if base_rate_for_emergency is None else base_rate_for_emergency
+    base_population = 200000 if base_population is None else base_population
     thread_list = []
     seconds_in_a_day = 1440
-    base_rate_for_emergency = 1.3165119
-    base_population = 200000
     number_of_emergencies = 0
     aggregate_resp_times = []
     aggregate_perc_successful = []
     plotting_emergency_dict = {}
     try:
         if test_city is None:
-            raise ValueError("Kindly check file again...")
+            raise ValueError("Kindly rerun after checking the file...")
         base_rate_per_person = base_rate_for_emergency/base_population
         zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(test_city.zone_populations))
         # Obtained code for displaying progress bar in for loop from:
@@ -216,10 +246,3 @@ def simulate(test_city):
         print(v)
     return [0], [0], [], {}
 
-
-# if __name__ == '__main__':
-#      city = configure_city_file('inner_medium_ps.txt')
-#      resp_times, perc_successfull, emergencies, plotting_emergency_dict = simulate(city)
-#      print(f"Total number of emergencies occured: {emergencies}")
-#      print(f"Average response time: {resp_times[-1]}")
-#      print(f"Success ratio : {perc_successfull[-1]}")
