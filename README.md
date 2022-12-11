@@ -15,6 +15,7 @@ This project is a Monte-Carlo simulation of a city with random emergency situati
 5. Total Number of Small Emergency Response Unit Buildings: The number of emergency response unit buildings (each having 3 emergency response team) that can be        constructed in the city.
 6. Locations of the Emergency Unit Buildings: The coordinate locations of the emergency unit buildings of each type.
 7. Probabilities of Emergency Intensities: The probabilities specifying the occurrence rate of each intensity type of emergency.
+8. Base emergency rate and population: The rate of emergency occurrence (number of emergencies per minute) and the reference population for which the rate is specified can be configured as user input to enable greater customization. However, these parameters are optional, and if not specified, the default values obtained using a real dataset will be utilized by the simulation.
 
 
 
