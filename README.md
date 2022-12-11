@@ -79,7 +79,7 @@ An example of small, medium and large emergency units positioned across the city
 3. Default Base Emergency Rate for a city is set to be 13 emergencies per minute for a population of 200k, which is scaled according to the population of the          configured city and zones
 4. Emergencies can be of 5 intensities with the below resolution time and personnel requirements
 ![image](https://user-images.githubusercontent.com/47455312/206881503-28ffcd49-657f-4510-ae8e-73c869fc54a6.png)
-5. Emergencies and Emergency Response units are both located on coordinates. Given that a coordinate represents an area and not a single point within the city, it      is permissible to have an emergency to be resolved as an emergency response unit located at the same coordinate
+5. Emergencies and Emergency Response units are both located on coordinates. Given that a coordinate represents an area and not a single point within the city, it      is permissible to have an emergency to be resolved as an emergency response unit located at the same coordinate. The commute time in such cases is assumed to a      minimal value of 1 minute
 (Please refer appendix for the justification behind assumptions)
 
 Configurable Parameters:
@@ -105,6 +105,19 @@ An example of emergency being responded to by teams from an emergency unit using
 
 **Hypothesis 1 and Hypothesis 2 are described in, and can be executed using their respective Jupyter Notebooks.**
 
+
+
+
+### Appendix
+
+**Base rate of emergency calculation**
+The base rate of emergency for a city was arrived at based on 911 emergency calls dataset from Montgomery County PD, which had date and time level record of emergency related calls. The emergency rate was calculated as #emergencies occuring every minute within Mongometry County which has a population of ~200K people. This value came out to be 13.16 which became the base emergency rate. Now, in order to obtain the emergency rate for each zone within the configured city for this simulation, the base rate was multiplied by the ratio of zone population to 200k
+
+**Successful Emergency Response Threshold**
+Based on a research conducted in the UK, the criteria for responding to emergencies was found to be 7 minutes on an average, with 90% emergencies being responded to within 10 minutes. We used this as a baseline in designing our city and configuring the parameters. Hence, the response time threshold was set to be 10 minutes
+
+**Number of Teams in Small, Medium and Large Emergency Unit Building**
+Based on real world data we know that a city of size 200k population has ~13 emergencies per minute. Hence we were able to estimate the #emergencies that would occur in our custom city given a certain population. We also know based on real world data that 90% of emergencies need to be responded to within 15 minutes, hence our threshold of 10 minutes From an implementation point of view, even if we say that 20% of the nodes can have an emergency unit, we would need x buildings. No of teams per building were chosen by experimentation so that we are able to meet all the other criteria that we were able find real world data for
 
 
 ### **References**
