@@ -63,7 +63,7 @@ def configure_city_file(configuration_file: str):
     >>> configure_city_file("test_config_1.txt") # doctest: +ELLIPSIS
     Kindly check width...
     >>> configure_city_file("test_config_2.txt") # doctest: +ELLIPSIS
-    ###Kindly check the file, only numeric...
+    ###Kindly check the configuration file...
     >>> configure_city_file("test_config_3.txt") # doctest: +ELLIPSIS
     Traceback (most recent call last):
     ...
@@ -71,7 +71,8 @@ def configure_city_file(configuration_file: str):
     >>> configure_city_file("test_config_4.txt") # doctest: +ELLIPSIS
     Coordinates are duplicate...
     >>> c = configure_city_file("test_config_5.txt")
-    >>> c.coordinate_populations # doctest: +ELLIPSIS
+    Didn't receive either rate or base population. Running the simulation using  default values of rate and population
+    >>> c[0].coordinate_populations # doctest: +ELLIPSIS
     [500.0, 500.0, 500.0...400.0]
     """
     city_init = 0
@@ -210,10 +211,12 @@ def simulate(test_city, base_rate_for_emergency: float, base_population: int):
     >>> 90 <= perc[-1]
     True
     """
+    # Setting rate of the number of emergencies per minute and the population reference for which the rate was
+    # specified to default values, if user input was not provided.
     base_rate_for_emergency = 13.165119 if base_rate_for_emergency is None else base_rate_for_emergency
     base_population = 200000 if base_population is None else base_population
     thread_list = []
-    seconds_in_a_day = 1440
+    minutes_in_a_day = 1440
     number_of_emergencies = 0
     aggregate_resp_times = []
     aggregate_perc_successful = []
@@ -225,13 +228,19 @@ def simulate(test_city, base_rate_for_emergency: float, base_population: int):
         zone_probabilities = poisson_probability(base_rate_per_person * np.asarray(test_city.zone_populations))
         # Obtained code for displaying progress bar in for loop from:
         # https://stackoverflow.com/questions/3160699/python-progress-bar
+        # Executing 100 simulation runs
         for run in tqdm(range(1, 101)):
-            for i in range(seconds_in_a_day):
+            # Each iteration and the corresponding computation in each iteration represents one minute of program/
+            # simulation time
+            for i in range(minutes_in_a_day):
+                # Traffic across the paths in the city are updated 4 times in a day (every 6 hours of real-time)
                 if i in [0, 359, 719, 1079]:
                     test_city.update_graph_edges(math.floor((i+1)/360))
+                # Using the probability of an emergency occurring in each zone, randomizing if an emergency occurs
                 for zone in range(len(zone_probabilities)):
                     prob = zone_probabilities[zone]*1000000
                     if random.randint(1, 1000000) <= prob:
+                        # New thread is spawned for every emergency creation and resolution
                         th = Thread(target=Emergency, args=[test_city, zone], daemon=False)
                         th.start()
                         thread_list.append(th)
@@ -245,8 +254,12 @@ def simulate(test_city, base_rate_for_emergency: float, base_population: int):
                 if emergency.time_to_respond <= Emergency.resolution_time_threshold:
                     successful_response_emergencies += 1
                 resp_times.append(emergency.time_to_respond)
+            # Calculating average of response time across all emergencies that occurred in 1 day (1 simulation run)
             avg_resp_time = np.mean(np.asarray(resp_times))
+            # Calculating percentage of emergencies that were successfully responded to in 1 day (1 simulation run)
             perc_successful = (successful_response_emergencies/len(resp_times))*100
+            # Aggregating the average response time and percentage of successfully responded emergencies over
+            # all simulation runs
             if run == 1:
                 for emergency in Emergency.emergencies[:5]:
                     plotting_emergency_dict[emergency.location] = [tuple(key.location) for key in

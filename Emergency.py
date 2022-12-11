@@ -33,10 +33,10 @@ class Emergency:
         >>> populations = [2000, 3500, 900, 4500, 700, 9000, 870, 4500, 2000, 400, 2400, 3000]
         >>> intensity_distributions = [0.2, 0.2, 0.2, 0.2, 0.2]
         >>> test1 = City(4, 3, populations, intensity_distributions)
-        >>> EmergencyUnit('large', (1, 7))
-        >>> EmergencyUnit('large', (3, 2))
-        >>> EmergencyUnit('large', (5, 0))
-        >>> EmergencyUnit('large', (7, 10))
+        >>> eu1 = EmergencyUnit('large', (1, 7))
+        >>> eu2 = EmergencyUnit('large', (3, 2))
+        >>> eu3 = EmergencyUnit('large', (5, 0))
+        >>> eu4 = EmergencyUnit('large', (7, 10))
         >>> e1=Emergency(test1, 8)
         >>> 6 <= e1.location[0] <= 8
         True
