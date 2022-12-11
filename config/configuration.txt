@@ -1,7 +1,7 @@
 ###Dimensions###
 Height 2
 Width 2
-####Population####Should enter height*width lines###
+####Population distribution####Should enter height*width lines###
 4500
 6500
 3200
@@ -19,5 +19,6 @@ Width 2
 ###Large buildings(7 teams)###
 1
 3,2
+##Emergency rate and base population###(Space separated)
 
 

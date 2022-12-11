@@ -22,9 +22,9 @@ class ValidationError(Exception):
 
     def __str__(self):
         if self.flag == "rate":
-            return f"Didnt received either rate or base population.Taking default values for rate and population and " \
-                   f"running "
-        return f"Kindly check {self.flag}, its passed as {self.x}. This isnt correct. It should be greater than 0"
+            return f"Didn't receive either rate or base population. Running the simulation using " \
+                   f" default values of rate and population"
+        return f"Kindly check {self.flag}, its passed as {self.x}. This isn't correct. It should be greater than 0"
 
 
 def poisson_probability(rates: np.array) -> np.array:
@@ -157,12 +157,12 @@ def configure_city_file(configuration_file: str):
                     configured_population = temp_list[1]
                 present_line = f.readline()
             return city_configured, float(configured_base_emergency_rate), int(configured_population)
-    except ValueError as v:
+    except (ValueError, UnboundLocalError, IndexError) as v:
         if re.search("int|float", v.__str__()):
             if building_flag in ["small", "medium", "large"]:
                 print(f"{building_flag} buildings has an issue.Possibly number of buildings != number of coordinates "
                       f"entered")
-            print("###Kindly check the file, only numeric values are allowed###")
+            print("###Kindly check the configuration file###")
         else:
             print(v)
     except ValidationError as v:
@@ -204,7 +204,7 @@ def simulate(test_city, base_rate_for_emergency: float, base_population: int):
     >>> e7 = EmergencyUnit('small', (2, 2))
     >>> e8 = EmergencyUnit('small', (2, 4))
     >>> e9 = EmergencyUnit('small', (0, 0))
-    >>> resp_time, perc, num_emer, emer_dict = simulate(test)
+    >>> resp_time, perc, num_emer, emer_dict = simulate(test, None, None)
     >>> 1.0 <= resp_time[-1] <= 3.0
     True
     >>> 90 <= perc[-1]
