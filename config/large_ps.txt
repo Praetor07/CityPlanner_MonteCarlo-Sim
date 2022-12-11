@@ -1,7 +1,7 @@
 ###Dimensions###
 Height 4
 Width 4
-####Population####Should enter height*width lines###
+####Population distribution####Should enter height*width lines###
 4500
 6500
 3200
@@ -30,3 +30,4 @@ Width 4
 3,6
 5,8
 8,6
+##Emergency rate and base population###(Space separated)

@@ -139,7 +139,6 @@ def configure_city_file(configuration_file: str):
                     count_of_large_buildings = int(f.readline().strip().split()[0])
                     counter = 0
                     while counter < count_of_large_buildings:
-                        print("in here")
                         coordinate = f.readline().split(',')
                         if not city_configured.check_coordinates(int(coordinate[0]), int(coordinate[1])):
                             print("Please enter valid coordinates according to the city configured.")
