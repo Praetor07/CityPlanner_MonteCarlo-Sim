@@ -75,6 +75,8 @@ def configure_city_file(configuration_file: str):
     """
     city_init = 0
     building_flag = ''
+    Emergency.clear_emergencies()
+    EmergencyUnit.clear_emergency_buildings()
     try:
         with open(f"./config/{configuration_file}", 'r') as f:
             present_line = f.readline()
@@ -170,6 +172,7 @@ def configure_city_file(configuration_file: str):
             print("###Kindly check the configuration file###")
         else:
             print(v)
+            print("###Kindly check the configuration file###")
     except ValidationError as v:
         print(v)
         if re.search("rate", v.__str__(), re.IGNORECASE):
